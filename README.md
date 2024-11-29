@@ -19,23 +19,23 @@ kolejki (po uprzednim wyjściu pacjenta). Jeśli w chwili zamknięcia przychodni
 czekali pacjenci to te osoby zostaną przyjęte w tym dniu ale nie mogą zostać skierowane na
 dodatkowe badania.
 Zasady działania przychodni ustalone przez Dyrektora są następujące:
-• Przychodnia jest czynna w godzinach od Tp do Tk;
-• W budynku przychodni w danej chwili może się znajdować co najwyżej N pacjentów
+- Przychodnia jest czynna w godzinach od Tp do Tk;
+- W budynku przychodni w danej chwili może się znajdować co najwyżej N pacjentów
 (pozostali, jeżeli są czekają przed wejściem);
-• Dzieci w wieku poniżej 18 lat do przychodni przychodzą pod opieką osoby dorosłej;
-• Każdy pacjent przed wizytą u lekarza musi się udać do rejestracji;
-• W przychodni są 2 okienka rejestracji, zawsze działa min. 1 stanowisko;
-• Jeżeli w kolejce do rejestracji stoi więcej niż K pacjentów (K>=N/2) otwiera się drugie okienko
+- Dzieci w wieku poniżej 18 lat do przychodni przychodzą pod opieką osoby dorosłej;
+- Każdy pacjent przed wizytą u lekarza musi się udać do rejestracji;
+- W przychodni są 2 okienka rejestracji, zawsze działa min. 1 stanowisko;
+- Jeżeli w kolejce do rejestracji stoi więcej niż K pacjentów (K>=N/2) otwiera się drugie okienko
 rejestracji. Drugie okienko zamyka się jeżeli liczba pacjentów w kolejce do rejestracji jest
 mniejsza niż N/3;
 14
-• Osoby uprawnione VIP (np. honorowy dawca krwi) do gabinetu lekarskiego wchodzą bez
+- Osoby uprawnione VIP (np. honorowy dawca krwi) do gabinetu lekarskiego wchodzą bez
 kolejki;
-• Jeżeli zostaną wyczerpane limity przyjęć do danego lekarza, pacjenci ci nie są przyjmowani
+- Jeżeli zostaną wyczerpane limity przyjęć do danego lekarza, pacjenci ci nie są przyjmowani
 (rejestrowani);
-• Jeżeli zostaną wyczerpane limity przyjęć w danym dniu do wszystkich lekarzy, pacjenci nie
+- Jeżeli zostaną wyczerpane limity przyjęć w danym dniu do wszystkich lekarzy, pacjenci nie
 są wpuszczani do budynku;
-• Jeśli w chwili zamknięcia przychodni w kolejce do rejestracji czekali pacjenci to te osoby nie
+- Jeśli w chwili zamknięcia przychodni w kolejce do rejestracji czekali pacjenci to te osoby nie
 zostaną przyjęte w tym dniu przez lekarza. Dane tych pacjentów (id - skierowanie do …. -
 wystawił) powinny zostać zapisane w raporcie dziennym.
 Na polecenie Dyrektora (sygnał 1) dany lekarz bada bieżącego pacjenta i kończy pracę przed
