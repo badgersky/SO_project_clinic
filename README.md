@@ -36,7 +36,7 @@ kolejki;
 - Jeżeli zostaną wyczerpane limity przyjęć w danym dniu do wszystkich lekarzy, pacjenci nie
 są wpuszczani do budynku;
 - Jeśli w chwili zamknięcia przychodni w kolejce do rejestracji czekali pacjenci to te osoby nie
-zostaną przyjęte w tym dniu przez lekarza. Dane tych pacjentów (id - skierowanie do …,
+zostaną przyjęte w tym dniu przez lekarza. Dane tych pacjentów (id - skierowanie do …
 wystawił) powinny zostać zapisane w raporcie dziennym.
 
 Na polecenie Dyrektora (sygnał 1) dany lekarz bada bieżącego pacjenta i kończy pracę przed
