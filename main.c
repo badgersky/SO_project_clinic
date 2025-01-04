@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <semaphore.h>
 
-# define P_NUM 10
+# define P_NUM 20
+# define MAX_P 100
 # define REG_NUM 2
 
 void register_routine(int num);
@@ -18,6 +19,16 @@ void create_registers();
 void create_director();
 
 void wait_registers();
+void wait_patients();
+void wait_director();
+
+void print_sem_val(sem_t* sem);
+
+void print_sem_val(sem_t* sem) {
+    int sem_val;
+    sem_getvalue(sem, &sem_val);
+    printf("%d\n", sem_val);
+}
 
 void register_routine(int num) {
     while(1) {
@@ -47,7 +58,7 @@ void patient_routine() {
 }
 
 void create_patients() {
-    while(1) {
+    for (int i = 0; i < MAX_P; i++) {
         sleep(2);
         create_patient();
     }
@@ -104,6 +115,14 @@ void wait_director() {
     }
 }
 
+void wait_patients() {
+    for (int i = 0; i < MAX_P; i++) {
+        if (wait(0) < 0) {
+            perror("wait");
+        }
+    }
+}
+
 int main() {
     create_director();
     create_registers();
@@ -111,6 +130,6 @@ int main() {
     
     wait_registers();
     wait_director();
-
+    wait_patients();
     return 0;
 }
