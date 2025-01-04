@@ -11,9 +11,12 @@
 void register_routine(int num);
 void director_routine();
 void patient_routine();
+
 void create_patients();
 void create_patient();
-void creeate_registers();
+void create_registers();
+void create_director();
+
 void wait_registers();
 
 void register_routine(int num) {
@@ -61,7 +64,18 @@ void create_patient() {
     }
 }
 
-void creeate_registers() {
+void create_director() {
+    pid_t d = fork();
+
+    if (d < 0) {
+        perror("fork");
+    }
+    if (d == 0) {
+        director_routine();
+    }
+}
+
+void create_registers() {
     pid_t reg[2];
 
     for (int i = 0; i < REG_NUM; i++) {
@@ -85,7 +99,8 @@ void wait_registers() {
 }
 
 int main() {
-    creeate_registers();
+    create_director();
+    create_registers();
     create_patients();
     wait_registers();
 
