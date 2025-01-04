@@ -98,11 +98,19 @@ void wait_registers() {
     }
 }
 
+void wait_director() {
+    if (wait(0) < 0) {
+        perror("wait");
+    }
+}
+
 int main() {
     create_director();
     create_registers();
     create_patients();
+    
     wait_registers();
+    wait_director();
 
     return 0;
 }
