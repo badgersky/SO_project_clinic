@@ -11,14 +11,6 @@
 
 # define P_NUM 10
 
-void print_sem_val(sem_t* sem);
-
-void print_sem_val(sem_t* sem) {
-    int sem_val;
-    sem_getvalue(sem, &sem_val);
-    printf("%d\n", sem_val);
-}
-
 int main() {
     create_director();
     create_registers();
@@ -26,6 +18,5 @@ int main() {
     
     wait_registers();
     wait_director();
-    wait_patients();
     return 0;
 }

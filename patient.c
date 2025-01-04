@@ -1,4 +1,5 @@
 #include "patient.h"
+#include "utils.h"
 
 void patient_routine() {
     for (int i = 0; i < 5; i++) {
@@ -11,6 +12,7 @@ void patient_routine() {
 
 void create_patients() {
     for (int i = 0; i < MAX_P; i++) {
+        sleep(1);
         create_patient();
     }
 }
