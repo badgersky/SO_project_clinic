@@ -8,13 +8,18 @@
 # define P_NUM 10
 # define REG_NUM 2
 
-
+void register_routine(int num);
+void director_routine();
+void patient_routine();
+void create_patients();
+void create_patient();
+void creeate_registers();
+void wait_registers();
 
 void register_routine(int num) {
     while(1) {
         sleep(1);
         printf("register %d\n", num);
-
     }
 
     exit(0);
@@ -29,12 +34,38 @@ void director_routine() {
     exit(0);
 }
 
+void patient_routine() {
+    for (int i = 0; i < 5; i++) {
+        sleep(1);
+        printf("patient %d\n", getpid());
+    }
+
+    exit(0);
+}
+
+void create_patients() {
+    while(1) {
+        sleep(2);
+        create_patient();
+    }
+}
+
+void create_patient() {
+    pid_t p = fork();
+
+    if (p < 0) {
+        perror("fork");
+    }
+    if (p == 0) {
+        patient_routine();
+    }
+}
+
 void creeate_registers() {
-    pid_t* reg = malloc(sizeof(pid_t) * 2);
+    pid_t reg[2];
 
     for (int i = 0; i < REG_NUM; i++) {
         reg[i] = fork();
-        printf("%d\n", reg[i]);
 
         if (reg[i] < 0) {
             perror("fork");
@@ -55,7 +86,7 @@ void wait_registers() {
 
 int main() {
     creeate_registers();
-    director_routine();
+    create_patients();
     wait_registers();
 
     return 0;
