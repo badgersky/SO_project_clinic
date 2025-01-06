@@ -5,11 +5,21 @@
 #include <stdlib.h>
 #include <semaphore.h>
 
+#ifndef PATIENT_H
+#define PATIENT_H
+
 # define MAX_P 20
 
-void patient_routine(int* p_cnt);
+struct p_queue{
+  int ids[MAX_P];
+  int i;
+};
 
-void create_patients(int* p_cnt);
-void create_patient(int* p_cnt);
+void patient_routine(int* p_cnt, struct p_queue* p_q);
+
+void create_patients(int* p_cnt, struct p_queue* p_q);
+void create_patient(int* p_cnt, struct p_queue* p_q);
 
 void wait_patients();
+
+#endif
