@@ -7,9 +7,9 @@
 
 # define MAX_P 20
 
-void patient_routine();
+void patient_routine(int* p_cnt);
 
 void create_patients(int* p_cnt);
-void create_patient();
+void create_patient(int* p_cnt);
 
 void wait_patients();
