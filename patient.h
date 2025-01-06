@@ -9,7 +9,7 @@
 
 void patient_routine();
 
-void create_patients();
+void create_patients(int* p_cnt);
 void create_patient();
 
 void wait_patients();
