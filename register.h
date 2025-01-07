@@ -10,7 +10,7 @@
 
 # define REG_NUM 2
 
-void register_routine(int num, int reg_fd[2]);
+void register_routine(int i, int reg_fd[2]);
 
 void create_registers(int reg_fd[2]);
 

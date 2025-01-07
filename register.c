@@ -1,17 +1,17 @@
 #include "register.h"
 
-void register_routine(int num, int reg_fd[2]) {
+void register_routine(int i, int reg_fd[2]) {
     srand(getpid());
     do {
-        sem_wait(reg);
+        sem_wait(reg[i]);
 
         sleep(4);
         close(reg_fd[1]);
         pid_t pid;
         read(reg_fd[0], &pid, sizeof(pid_t));
-        printf("register %d processing patient %d\n", num, pid);
+        printf("register %d processing patient %d\n", i, pid);
 
-        sem_post(reg);
+        sem_post(reg[i]);
     } while(1);
 
     exit(0);
