@@ -24,7 +24,7 @@ void create_registers(int reg_fd[2]) {
         reg[i] = fork();
 
         if (reg[i] < 0) {
-            perror("fork");
+            perror("fork"); exit(5);
         } 
         if (reg[i] == 0) {
             register_routine(i + 1, reg_fd);
@@ -35,7 +35,7 @@ void create_registers(int reg_fd[2]) {
 void wait_registers() {
     for (int i = 0; i < REG_NUM; i++) {
         if (wait(0) < 0) {
-            perror("wait");
+            perror("wait"); exit(5);
         }
     }
 }

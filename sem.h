@@ -1,6 +1,7 @@
 #include <semaphore.h>
 #include <sys/mman.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifndef SEM_H
 #define SEM_H

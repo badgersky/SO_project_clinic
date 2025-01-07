@@ -11,7 +11,7 @@ void create_doctor(int type, char* spec) {
     pid_t pid = fork();
 
     if (pid < 0) {
-        perror("fork");
+        perror("fork"); exit(1);
     }
     if (pid == 0) {
         doctor_routine(type, spec);

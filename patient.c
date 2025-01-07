@@ -31,7 +31,7 @@ void create_patient(int* p_cnt, int reg_fd[2]) {
     pid_t p = fork();
 
     if (p < 0) {
-        perror("fork");
+        perror("fork"); exit(3);
     }
     if (p == 0) {
         patient_routine(p_cnt, reg_fd);
@@ -41,7 +41,7 @@ void create_patient(int* p_cnt, int reg_fd[2]) {
 void wait_patients() {
     for (int i = 0; i < MAX_P; i++) {
         if (wait(0) < 0) {
-            perror("wait");
+            perror("wait"); exit(3);
         }
     }
 }

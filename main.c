@@ -14,12 +14,12 @@
 
 int main() {
 	int reg_fd[2];
-    if (pipe(reg_fd) < 0) perror("pipe");
+    if (pipe(reg_fd) < 0) perror("pipe"); exit(6);
 
     initialize_sem();
 
     int* p_cnt = (int*) mmap(0, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    if (p_cnt == MAP_FAILED) perror("mmap");
+    if (p_cnt == MAP_FAILED) perror("mmap"); exit(6);
 
     *p_cnt = 0;
     create_director(p_cnt);
@@ -36,6 +36,6 @@ int main() {
 
     destroy_sem();
 
-    if (munmap(p_cnt, sizeof(int)) < 0) perror("munmap");
+    if (munmap(p_cnt, sizeof(int)) < 0) perror("munmap"); exit(6);
     return 0;
 }
