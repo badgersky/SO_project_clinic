@@ -2,42 +2,38 @@
 #include "utils.h"
 #include "sem.h"
 
-void patient_routine(int* p_cnt, struct p_queue* p_q) {
+void patient_routine(int* p_cnt, int reg_fd[2]) {
+    srand(getpid());
     sem_wait(door);
     *p_cnt += 1;
     sem_post(door);
 
-    sem_wait(reg_q_e);
-    sem_wait(reg);
-
-    int pid = getpid();
-    p_q->ids[p_q->i] = pid;
-    p_q->i += 1;
-
-    sem_post(reg);
-    sem_post(reg_q_f);
+    close(reg_fd[0]);
+    pid_t pid = getpid();
+    printf("patient %d registering\n", pid);
+    write(reg_fd[1], &pid, sizeof(pid_t));
 
     sem_wait(door);
     *p_cnt -= 1;
     sem_post(door);
-    sleep(1);
+    exit(0);
 }
 
-void create_patients(int* p_cnt, struct p_queue* p_q) {
+void create_patients(int* p_cnt, int reg_fd[2]) {
     for (int i = 0; i < MAX_P; i++) {
         sleep(1);
-        create_patient(p_cnt, p_q);
+        create_patient(p_cnt, reg_fd);
     }
 }
 
-void create_patient(int* p_cnt, struct p_queue* p_q) {
+void create_patient(int* p_cnt, int reg_fd[2]) {
     pid_t p = fork();
 
     if (p < 0) {
         perror("fork");
     }
     if (p == 0) {
-        patient_routine(p_cnt, p_q);
+        patient_routine(p_cnt, reg_fd);
     }
 }
 

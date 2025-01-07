@@ -10,8 +10,8 @@
 
 # define REG_NUM 2
 
-void register_routine(int num, int* p_cnt, struct p_queue* p_q);
+void register_routine(int num, int* p_cnt, int reg_fd[2]);
 
-void create_registers(int* p_cnt, struct p_queue* p_q);
+void create_registers(int* p_cnt, int reg_fd[2]);
 
 void wait_registers();

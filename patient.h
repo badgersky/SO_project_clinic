@@ -10,15 +10,10 @@
 
 # define MAX_P 20
 
-struct p_queue{
-  int ids[MAX_P];
-  int i;
-};
+void patient_routine(int* p_cnt, int reg_fd[2]);
 
-void patient_routine(int* p_cnt, struct p_queue* p_q);
-
-void create_patients(int* p_cnt, struct p_queue* p_q);
-void create_patient(int* p_cnt, struct p_queue* p_q);
+void create_patients(int* p_cnt, int reg_fd[2]);
+void create_patient(int* p_cnt, int reg_fd[2]);
 
 void wait_patients();
 
