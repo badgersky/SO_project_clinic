@@ -18,3 +18,5 @@ void pediatrician_routine();
 void occup_med_doctor_routine();
 
 void create_doctor(int type);
+
+void wait_doctors();

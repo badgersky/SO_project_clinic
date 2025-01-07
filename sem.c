@@ -1,5 +1,7 @@
 #include "sem.h"
 
+sem_t *door, *reg;
+
 void initialize_sem() {
     door = (sem_t*) mmap(0, sizeof(sem_t), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     if (door == MAP_FAILED) perror("mmap");

@@ -24,15 +24,15 @@ int main() {
     *p_cnt = 0;
     create_director(p_cnt);
     create_registers(reg_fd);
-    create_patients(p_cnt, reg_fd);
-
     for (int i = 0; i < 6; i++) {
         if (i == 0) i+= 1;
         create_doctor(i);
     }
+    create_patients(p_cnt, reg_fd);
 
     wait_registers();
     wait_director();
+    wait_doctors();
 
     destroy_sem();
 

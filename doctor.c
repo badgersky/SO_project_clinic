@@ -4,16 +4,24 @@ void doctor_routine(int type) {
     switch (type) {
         case 1:
             poz_doctor_routine();
+            break;
         case 2:
             oculist_routine();
+            break;
         case 3:
             cardiologist_routine();
+            break;
         case 4:
             pediatrician_routine();
+            break;
         case 5:
             occup_med_doctor_routine();
-        break;
+            break;
+        default:
+            return;
     }
+
+    exit(0);
 }
 
 void create_doctor(int type) {
@@ -45,4 +53,10 @@ void pediatrician_routine() {
 
 void occup_med_doctor_routine() {
     printf("occupational medicine doctor\n");
+}
+
+void wait_doctors() {
+    for (int i = 0; i < 6; i++) {
+        if (wait(0) < 0) perror("wait");
+    }
 }

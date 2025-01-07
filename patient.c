@@ -1,5 +1,4 @@
 #include "patient.h"
-#include "utils.h"
 #include "sem.h"
 
 void patient_routine(int* p_cnt, int reg_fd[2]) {
