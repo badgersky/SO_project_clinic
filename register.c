@@ -1,6 +1,6 @@
 #include "register.h"
 
-void register_routine(int num, int* p_cnt, int reg_fd[2]) {
+void register_routine(int num, int reg_fd[2]) {
     srand(getpid());
     do {
         sem_wait(reg);
@@ -17,7 +17,7 @@ void register_routine(int num, int* p_cnt, int reg_fd[2]) {
     exit(0);
 }
 
-void create_registers(int* p_cnt, int reg_fd[2]) {
+void create_registers(int reg_fd[2]) {
     pid_t reg[2];
 
     for (int i = 0; i < REG_NUM; i++) {
@@ -27,7 +27,7 @@ void create_registers(int* p_cnt, int reg_fd[2]) {
             perror("fork");
         } 
         if (reg[i] == 0) {
-            register_routine(i + 1, p_cnt, reg_fd);
+            register_routine(i + 1, reg_fd);
         }
     }
 }

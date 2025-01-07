@@ -1,22 +1,25 @@
 #include "director.h"
+#include "sem.h"
 
-void director_routine() {
-    while(1) {
-        sleep(1);
-        printf("director\n");
-    }
+void director_routine(int* p_cnt) {
+    do {
+        sem_wait(door);
+        printf("director, number of patients: %d\n", *p_cnt);
+        sem_post(door);
+        sleep(3);
+    } while(1);
 
     exit(0);
 }
 
-void create_director() {
+void create_director(int* p_cnt) {
     pid_t d = fork();
 
     if (d < 0) {
         perror("fork");
     }
     if (d == 0) {
-        director_routine();
+        director_routine(p_cnt);
     }
 }
 

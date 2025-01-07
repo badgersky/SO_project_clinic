@@ -24,12 +24,12 @@ int main() {
     int* p_cnt = (int*) mmap(0, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     if (p_cnt == MAP_FAILED) perror("mmap");
 
-    *p_cnt = 0;
     if (sem_init(door, 1, 1) < 0) perror("sem_init");
     if (sem_init(reg, 1, 2) < 0) perror("sem_init");
 
-    create_director();
-    create_registers(p_cnt, reg_fd);
+    *p_cnt = 0;
+    create_director(p_cnt);
+    create_registers(reg_fd);
     create_patients(p_cnt, reg_fd);
     
     wait_registers();
