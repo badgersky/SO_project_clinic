@@ -4,19 +4,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <semaphore.h>
+#include <string.h>
+#include <sys/mman.h>
 
-void doctor_routine(int type);
+#define MAX_SPEC_CHAR 25
+
+void doctor_routine(int type, char* spec);
 
 void poz_doctor_routine();
 
-void oculist_routine();
+void specialist_routine(char* spec);
 
-void cardiologist_routine();
+void create_doctor(int type, char* spec);
 
-void pediatrician_routine();
-
-void occup_med_doctor_routine();
-
-void create_doctor(int type);
+char** get_specializations();
 
 void wait_doctors();
