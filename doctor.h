@@ -11,12 +11,14 @@
 
 void doctor_routine(int type, char* spec);
 
-void poz_doctor_routine();
+void poz_doctor_routine(char* spec);
 
 void specialist_routine(char* spec);
 
 void create_doctor(int type, char* spec);
 
 char** get_specializations();
+
+void free_specializations(char** specs);
 
 void wait_doctors();
