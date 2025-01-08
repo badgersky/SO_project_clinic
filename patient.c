@@ -20,7 +20,7 @@ void patient_register(int* reg_q_cnt, int reg_fd[2]) {
     pid_t pid = getpid();
     printf("patient %d registering\n", pid);
     write(reg_fd[1], &pid, sizeof(pid_t));
-    sleep(12);
+    sleep(10);
     sem_wait(reg_q);
     *reg_q_cnt -= 1;
     sem_post(reg_q);
