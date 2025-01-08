@@ -9,7 +9,8 @@
 extern sem_t *door;
 extern sem_t *reg_q;
 extern sem_t *reg[2];
-extern sem_t* doctors[6];
+extern sem_t* doctors[4];
+extern sem_t* poz;
 
 #endif
 

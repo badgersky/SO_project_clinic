@@ -7,7 +7,7 @@ void doctor_routine(int type, char* spec) {
     exit(0);
 }
 
-void create_doctor(int type, char* spec) {
+void create_doctor(int type, char* spec, int dr_fd[6][2]) {
     pid_t pid = fork();
 
     if (pid < 0) {perror("fork"); exit(1);}

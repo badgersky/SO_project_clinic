@@ -1,11 +1,13 @@
 #include "patient.h"
 #include "sem.h"
 
-void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2]) {
+void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs) {
 	int dr_id = get_dr_id();
   	sem_wait(reg_q);
     *reg_q_cnt += 1;
     sem_post(reg_q);
+
+    printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
 	patient_register(reg_q_cnt, reg_fd);
 
     sem_wait(door);
@@ -14,13 +16,18 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2]) {
     exit(0);
 }
 
+void go_to_poz() {
+	pid_t pid = getpid();
+}
+
 int get_dr_id() {
 	srand(getpid());
-	int dr_id;
+	int dr_id, i;
     int poz_ids[2] = {4, 5};
   	int rand_int = rand() % 10 + 1;
     if (rand_int < 6) {
-    	dr_id = poz_ids[rand() % 2 + 4];
+    	i = rand() % 2;
+        dr_id = poz_ids[i];
     }
     if (rand_int == 6) dr_id = 0;
     if (rand_int == 7) dr_id = 1;
@@ -40,22 +47,22 @@ void patient_register(int* reg_q_cnt, int reg_fd[2]) {
     sem_post(reg_q);
 }
 
-void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2]) {
+void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2]) {
 	do {
           sem_wait(door);
-          if (*p_cnt < MAX_P) {create_patient(reg_q_cnt, p_cnt, reg_fd), *p_cnt += 1;};
+          if (*p_cnt < MAX_P) {create_patient(reg_q_cnt, p_cnt, reg_fd, specs), *p_cnt += 1;};
           sem_post(door);
           sleep(1);
 	} while(1);
 }
 
-void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2]) {
+void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs) {
     pid_t p = fork();
 
     if (p < 0) {perror("fork"); exit(3);}
     if (p == 0) {
         close(reg_fd[0]);
-        patient_routine(reg_q_cnt, p_cnt, reg_fd);
+        patient_routine(reg_q_cnt, p_cnt, reg_fd, specs);
     }
 }
 

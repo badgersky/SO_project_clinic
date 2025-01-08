@@ -15,7 +15,7 @@ void poz_doctor_routine(char* spec);
 
 void specialist_routine(char* spec);
 
-void create_doctor(int type, char* spec);
+void create_doctor(int type, char* spec, int dr_fd[6][2]);
 
 char** get_specializations();
 
