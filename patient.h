@@ -10,6 +10,8 @@
 
 # define MAX_P 20
 
+int get_dr_id();
+
 void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2]);
 
 void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2]);

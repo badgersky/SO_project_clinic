@@ -2,9 +2,8 @@
 #include "sem.h"
 
 void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2]) {
-    printf("Patient %d entered, total patients: %d\n", getpid(), *p_cnt);
-
-    sem_wait(reg_q);
+	int dr_id = get_dr_id();
+  	sem_wait(reg_q);
     *reg_q_cnt += 1;
     sem_post(reg_q);
 	patient_register(reg_q_cnt, reg_fd);
@@ -15,10 +14,25 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2]) {
     exit(0);
 }
 
+int get_dr_id() {
+	srand(getpid());
+	int dr_id;
+    int poz_ids[2] = {4, 5};
+  	int rand_int = rand() % 10 + 1;
+    if (rand_int < 6) {
+    	dr_id = poz_ids[rand() % 2 + 4];
+    }
+    if (rand_int == 6) dr_id = 0;
+    if (rand_int == 7) dr_id = 1;
+    if (rand_int == 8) dr_id = 2;
+    if (rand_int == 9) dr_id = 3;
+
+    return dr_id;
+}
+
 void patient_register(int* reg_q_cnt, int reg_fd[2]) {
 	srand(getpid());
     pid_t pid = getpid();
-    printf("patient %d registering\n", pid);
     write(reg_fd[1], &pid, sizeof(pid_t));
     sleep(10);
     sem_wait(reg_q);
