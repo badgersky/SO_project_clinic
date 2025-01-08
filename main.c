@@ -47,5 +47,7 @@ int main() {
     free_specializations(specs);
 
     if (munmap(p_cnt, sizeof(int)) < 0) {perror("munmap"); exit(6);}
+    if (munmap(reg_q_cnt, sizeof(int)) < 0) {perror("munmap"); exit(6);}
+    if (munmap(reg_arr, sizeof(int) * 2) < 0) {perror("munmap"); exit(6);}
     return 0;
 }
