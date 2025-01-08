@@ -29,8 +29,8 @@ int main() {
     specs = get_specializations();
 
     *p_cnt = 0;
-    create_director(p_cnt, reg_arr);
-    create_registers(reg_fd, reg_arr);
+    create_director(reg_fd, p_cnt, reg_arr);
+    create_register(0, reg_fd, reg_arr);
     for (int i = 0; i < 6; i++) {
         create_doctor(i, specs[i]);
     }

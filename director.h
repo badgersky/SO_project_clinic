@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <semaphore.h>
 
-void director_routine(int* p_cnt, int* reg_arr);
+void director_routine(int reg_fd[2], int* p_cnt, int* reg_arr);
 
-void create_director(int* p_cnt, int* reg_arr);
+void create_director(int reg_fd[2], int* p_cnt, int* reg_arr);
 
 void wait_director();

@@ -1,8 +1,9 @@
 #include "register.h"
 
-void open_reg(int *reg_arr) {
+void open_reg(int i, int reg_fd[2], int *reg_arr) {
     if (reg_arr[1] == 0) reg_arr[1] = 1;
     printf("opening register\n");
+    create_register(1, reg_fd, reg_arr);
     sem_post(reg[1]);
 }
 
@@ -19,14 +20,14 @@ int is_open_reg(int *reg_arr) {
 
 void register_routine(int i, int reg_fd[2], int* reg_arr) {
     srand(getpid());
+    close(reg_fd[1]);
     do {
         sem_wait(reg[i]);
 
-        sleep(4);
-        close(reg_fd[1]);
+        sleep(2);
         pid_t pid;
         read(reg_fd[0], &pid, sizeof(pid_t));
-        printf("register %d processing patient %d\n", i, pid);
+        printf("register %d processing patient %d\n", i + 1, pid);
 
         sem_post(reg[i]);
     } while(1);
@@ -34,16 +35,14 @@ void register_routine(int i, int reg_fd[2], int* reg_arr) {
     exit(0);
 }
 
-void create_registers(int reg_fd[2], int* reg_arr) {
-    pid_t reg[2];
+void create_register(int i, int reg_fd[2], int* reg_arr) {
+    pid_t reg;
 
-    for (int i = 0; i < REG_NUM; i++) {
-        reg[i] = fork();
+    reg = fork();
 
-        if (reg[i] < 0) {perror("fork"); exit(5);}
-        if (reg[i] == 0) {
-            register_routine(i, reg_fd, reg_arr);
-        }
+    if (reg < 0) {perror("fork"); exit(5);}
+    if (reg == 0) {
+        register_routine(i, reg_fd, reg_arr);
     }
 }
 

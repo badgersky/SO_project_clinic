@@ -2,11 +2,11 @@
 #include "sem.h"
 #include "register.h"
 
-void director_routine(int* p_cnt, int* reg_arr) {
+void director_routine(int reg_fd[2], int* p_cnt, int* reg_arr) {
     do {
         sem_wait(door);
         printf("director, number of patients: %d\n", *p_cnt);
-        if (!is_open_reg(reg_arr) && *p_cnt >= MAX_P / 2) open_reg(reg_arr);
+        if (!is_open_reg(reg_arr) && *p_cnt >= MAX_P / 2) open_reg(1, reg_fd, reg_arr);
         sem_post(door);
         sleep(3);
     } while(1);
@@ -14,12 +14,12 @@ void director_routine(int* p_cnt, int* reg_arr) {
     exit(0);
 }
 
-void create_director(int* p_cnt, int* reg_arr) {
+void create_director(int reg_fd[2], int* p_cnt, int* reg_arr) {
     pid_t d = fork();
 
     if (d < 0) {perror("fork"); exit(4);}
     if (d == 0) {
-        director_routine(p_cnt, reg_arr);
+        director_routine(reg_fd, p_cnt, reg_arr);
     }
 }
 
