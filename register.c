@@ -1,5 +1,13 @@
 #include "register.h"
 
+void open_reg(int *reg_arr[2]) {
+    if (*reg_arr[1] == 0) *reg_arr[1] = 1;
+}
+
+void close_reg(int *reg_arr[2]) {
+	if (*reg_arr[1] == 1) *reg_arr[1] = 0;
+}
+
 void register_routine(int i, int reg_fd[2]) {
     srand(getpid());
     do {

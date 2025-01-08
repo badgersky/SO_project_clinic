@@ -10,6 +10,10 @@
 
 # define REG_NUM 2
 
+void open_reg(int *reg_arr[2]);
+
+void close_reg(int *reg_arr[2]);
+
 void register_routine(int i, int reg_fd[2]);
 
 void create_registers(int reg_fd[2]);
