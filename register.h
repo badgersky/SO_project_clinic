@@ -10,12 +10,14 @@
 
 # define REG_NUM 2
 
-void open_reg(int *reg_arr[2]);
+int is_open_reg(int *reg_arr);
 
-void close_reg(int *reg_arr[2]);
+void open_reg(int *reg_arr);
 
-void register_routine(int i, int reg_fd[2]);
+void close_reg(int *reg_arr);
 
-void create_registers(int reg_fd[2]);
+void register_routine(int reg_fd[2], int* reg_arr);
+
+void create_registers(int reg_fd[2], int* reg_arr);
 
 void wait_registers();

@@ -21,10 +21,12 @@ void patient_routine(int* p_cnt, int reg_fd[2]) {
 }
 
 void create_patients(int* p_cnt, int reg_fd[2]) {
-    for (int i = 0; i < MAX_P; i++) {
-        sleep(1);
-        create_patient(p_cnt, reg_fd);
-    }
+	do {
+          sem_wait(door);
+          if (*p_cnt < MAX_P) create_patient(p_cnt, reg_fd);
+          sem_post(door);
+          sleep(1);
+	} while(1);
 }
 
 void create_patient(int* p_cnt, int reg_fd[2]) {
