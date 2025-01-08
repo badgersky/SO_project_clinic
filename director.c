@@ -6,10 +6,7 @@ void director_routine(int* p_cnt, int* reg_arr) {
     do {
         sem_wait(door);
         printf("director, number of patients: %d\n", *p_cnt);
-        sem_wait(reg_o);
         if (!is_open_reg(reg_arr) && *p_cnt >= MAX_P / 2) open_reg(reg_arr);
-       	if (is_open_reg(reg_arr) && *p_cnt < MAX_P) close_reg(reg_arr);
-        sem_post(reg_o);
         sem_post(door);
         sleep(3);
     } while(1);

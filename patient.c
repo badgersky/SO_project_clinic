@@ -12,7 +12,7 @@ void patient_routine(int* p_cnt, int reg_fd[2]) {
     pid_t pid = getpid();
     printf("patient %d registering\n", pid);
     write(reg_fd[1], &pid, sizeof(pid_t));
-    sleep(rand() % 5 + 1);
+	sleep(10);
 
     sem_wait(door);
     *p_cnt -= 1;

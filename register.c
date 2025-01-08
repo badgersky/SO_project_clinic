@@ -2,10 +2,14 @@
 
 void open_reg(int *reg_arr) {
     if (reg_arr[1] == 0) reg_arr[1] = 1;
+    printf("opening register\n");
+    sem_post(reg[1]);
 }
 
 void close_reg(int *reg_arr) {
 	if (reg_arr[1] == 1) reg_arr[1] = 0;
+    printf("closing register\n");
+    sem_wait(reg[1]);
 }
 
 int is_open_reg(int *reg_arr) {
@@ -13,25 +17,18 @@ int is_open_reg(int *reg_arr) {
     return 0;
 }
 
-void register_routine(int reg_fd[2], int* reg_arr) {
+void register_routine(int i, int reg_fd[2], int* reg_arr) {
     srand(getpid());
     do {
-      	int j = 0;
-        sem_wait(reg_o);
-      	if (is_open_reg(reg_arr)) {
-        	j = rand() % 2;
-      	}
-        sem_post(reg_o);
-
-        sem_wait(reg[j]);
+        sem_wait(reg[i]);
 
         sleep(4);
         close(reg_fd[1]);
         pid_t pid;
         read(reg_fd[0], &pid, sizeof(pid_t));
-        printf("register %d processing patient %d\n", j + 1, pid);
+        printf("register %d processing patient %d\n", i, pid);
 
-        sem_post(reg[j]);
+        sem_post(reg[i]);
     } while(1);
 
     exit(0);
@@ -45,7 +42,7 @@ void create_registers(int reg_fd[2], int* reg_arr) {
 
         if (reg[i] < 0) {perror("fork"); exit(5);}
         if (reg[i] == 0) {
-            register_routine(reg_fd, reg_arr);
+            register_routine(i, reg_fd, reg_arr);
         }
     }
 }
