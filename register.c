@@ -20,24 +20,29 @@ int is_open_reg(int *reg_arr) {
 
 void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
     srand(getpid());
-    close(reg_fd[1]);
+    int reg_res;
     do {
-      	sem_wait(reg_q);
+//        sem_wait(reg_q);
 //        printf("patients in register queue: %d\n", *reg_q_cnt);
-        sem_post(reg_q);
+//        sem_post(reg_q);
 
         sem_wait(reg[i]);
         int dr_id;
         read(reg_fd[0], &dr_id, sizeof(pid_t));
         sem_wait(dr_q[dr_id]);
         if (visits_cnt[dr_id] < dr_limits[dr_id]) {
-        	printf("register %d registering patient to %s\n", i + 1, specs[dr_id]);
+            visits_cnt[dr_id] += 1;
+            reg_res = 1;
+            printf("register registering patient to %s\n", specs[dr_id]);
+            write(reg_fd[1], &reg_res, sizeof(pid_t));
         } else {
-        	printf("limits for %s reached\n", specs[dr_id]);
+            reg_res = 0;
+            write(reg_fd[1], &reg_res, sizeof(pid_t));
         }
         sem_post(dr_q[dr_id]);
 
         sem_post(reg[i]);
+        sleep(1);
     } while(1);
 
     exit(0);

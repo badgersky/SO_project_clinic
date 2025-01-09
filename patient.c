@@ -3,41 +3,29 @@
 
 void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2], int* visits_cnt, int* dr_limits) {
 	int dr_id = get_dr_id();
-  	sem_wait(reg_q);
+  	int reg_res;
+
+    sem_wait(reg_q);
     *reg_q_cnt += 1;
     sem_post(reg_q);
 
 //    printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
-	patient_register(reg_q_cnt, reg_fd, dr_id);
+	reg_res = patient_register(reg_q_cnt, reg_fd, dr_id);
 
-    int poz_id = 4 + rand() % 2;
-    sem_wait(dr_q[poz_id]);
-    if (visits_cnt[poz_id] < dr_limits[poz_id]) {
-    	visits_cnt[poz_id] += 1;
-		go_to_doc(dr_fd, poz_id);
+    if (reg_res == 1) {
+        go_to_doc(dr_fd[dr_id], dr_id);
     }
-	sem_post(dr_q[poz_id]);
-
-//    if (dr_id != 4 && dr_id != 5) {
-//    	sem_wait(dr_q[poz_id]);
-//        if (visits_cnt[dr_id] < dr_limits[dr_id]) {
-//        	visits_cnt[dr_id] += 1;
-//            go_to_spec(dr_fd, dr_id);
-//        }
-//        sem_post(dr_q[dr_id]);
-//    }
-
     sem_wait(door);
     *p_cnt -= 1;
     sem_post(door);
     exit(0);
 }
 
-void go_to_doc(int dr_fd[6][2], int dr_id) {
+void go_to_doc(int dr_fd[2], int dr_id) {
 	pid_t pid = getpid();
 
     sem_wait(doctors[dr_id]);
-    write(dr_fd[dr_id][1], &pid, sizeof(pid_t));
+    write(dr_fd[1], &pid, sizeof(pid_t));
     sem_post(doctors[dr_id]);
 }
 
@@ -58,12 +46,17 @@ int get_dr_id() {
     return dr_id;
 }
 
-void patient_register(int* reg_q_cnt, int reg_fd[2], int dr_id) {
+int patient_register(int* reg_q_cnt, int reg_fd[2], int dr_id) {
 	srand(getpid());
+    int reg_res;
     write(reg_fd[1], &dr_id, sizeof(pid_t));
+    sleep(1);
+    read(reg_fd[0], &reg_res, sizeof(int));
+    printf("patient %d register result: %d\n", getpid(), reg_res);
     sem_wait(reg_q);
     *reg_q_cnt -= 1;
     sem_post(reg_q);
+    return reg_res;
 }
 
 void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2], int* visits_cnt, int* dr_limits) {
@@ -83,7 +76,6 @@ void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int
 
     if (p < 0) {perror("fork"); exit(3);}
     if (p == 0) {
-        close(reg_fd[0]);
         for (int i = 0; i < 6; i++) {
         	close(dr_fd[i][0]);
         }
