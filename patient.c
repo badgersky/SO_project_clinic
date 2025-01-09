@@ -7,9 +7,11 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, in
     *reg_q_cnt += 1;
     sem_post(reg_q);
 
-//    printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
+	printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
 	patient_register(reg_q_cnt, reg_fd);
-	go_to_poz(dr_fd);
+
+    int poz_id = 4 + rand() % 2;
+	go_to_poz(dr_fd, poz_id);
 
     sem_wait(door);
     *p_cnt -= 1;
@@ -17,12 +19,11 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, in
     exit(0);
 }
 
-void go_to_poz(int dr_fd[6][2]) {
+void go_to_poz(int dr_fd[6][2], int poz_id) {
 	pid_t pid = getpid();
-	int dr_id = 4 + rand() % 2;
 
     sem_wait(poz);
-    write(dr_fd[dr_id][1], &pid, sizeof(pid_t));
+    write(dr_fd[poz_id][1], &pid, sizeof(pid_t));
     sem_post(poz);
 }
 

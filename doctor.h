@@ -7,6 +7,12 @@
 #include <string.h>
 #include <sys/mman.h>
 
+#define X1 10
+#define X2 8
+#define X3 8
+#define X4 8
+#define X5 8
+
 #define MAX_SPEC_CHAR 25
 
 void doctor_routine(int type, char* spec, int dr_fd[6][2]);

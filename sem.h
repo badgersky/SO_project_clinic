@@ -11,6 +11,7 @@ extern sem_t *reg_q;
 extern sem_t *reg[2];
 extern sem_t* doctors[4];
 extern sem_t* poz;
+extern sem_t* dr_q[6];
 
 #endif
 

@@ -14,6 +14,20 @@
 
 int main() {
     initialize_sem();
+    int* dr_limits = (int*) mmap(NULL, sizeof(int) * 6, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
+    if (dr_limits == MAP_FAILED) {perror("mmap"); exit(6);}
+    dr_limits[0] = X5;
+    dr_limits[1] = X4;
+    dr_limits[2] = X3;
+    dr_limits[3] = X2;
+    dr_limits[4] = X1;
+    dr_limits[5] = X1;
+
+    int* visits_cnt = (int*) mmap(NULL, sizeof(int) * 6, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	if (visits_cnt == MAP_FAILED) {perror("mmap"); exit(6);}
+    for (int i = 0; i < 6; i++) {
+    	visits_cnt[i] = 0;
+    }
 
     int* reg_arr = (int*) mmap(NULL, sizeof(int) * 2, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	if (reg_arr == MAP_FAILED) {perror("mmap"); exit(6);}
@@ -53,5 +67,7 @@ int main() {
     if (munmap(p_cnt, sizeof(int)) < 0) {perror("munmap"); exit(6);}
     if (munmap(reg_q_cnt, sizeof(int)) < 0) {perror("munmap"); exit(6);}
     if (munmap(reg_arr, sizeof(int) * 2) < 0) {perror("munmap"); exit(6);}
+    if (munmap(dr_limits, sizeof(int) * 6) < 0) {perror("munmap"); exit(6);}
+    if (munmap(visits_cnt, sizeof(int) * 6) < 0) {perror("munmap"); exit(6);}
     return 0;
 }
