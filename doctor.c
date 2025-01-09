@@ -27,8 +27,11 @@ void poz_doctor_routine(char* spec, int dr_fd[2]) {
 }
 
 void specialist_routine(char* spec, int dr_fd[2]) {
+	close(dr_fd[1]);
     do {
-//        printf("%s\n", spec);
+		pid_t pid;
+        read(dr_fd[0], &pid, sizeof(pid_t));
+        printf("%s examining patient %d\n", spec, pid);
         sleep(2);
     } while(1);
 }

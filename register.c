@@ -1,8 +1,8 @@
 #include "register.h"
 
-pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs, int* visits_cnt) {
+pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
 //    printf("opening register\n");
-    pid_t pid = create_register(reg_q_cnt, 1, reg_fd, reg_arr, specs, visits_cnt);
+    pid_t pid = create_register(reg_q_cnt, 1, reg_fd, reg_arr, specs, visits_cnt, dr_limits);
     sem_post(reg[1]);
     return pid;
 }
@@ -18,7 +18,7 @@ int is_open_reg(int *reg_arr) {
     return 0;
 }
 
-void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt) {
+void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
     srand(getpid());
     close(reg_fd[1]);
     do {
@@ -27,23 +27,30 @@ void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char**
         sem_post(reg_q);
 
         sem_wait(reg[i]);
-		pid_t pid;
-        read(reg_fd[0], &pid, sizeof(pid_t));
-//        printf("register %d registering patient %d\n", i + 1, pid);
+        int dr_id;
+        read(reg_fd[0], &dr_id, sizeof(pid_t));
+        sem_wait(dr_q[dr_id]);
+        if (visits_cnt[dr_id] < dr_limits[dr_id]) {
+        	printf("register %d registering patient to %s\n", i + 1, specs[dr_id]);
+        } else {
+        	printf("limits for %s reached\n", specs[dr_id]);
+        }
+        sem_post(dr_q[dr_id]);
+
         sem_post(reg[i]);
     } while(1);
 
     exit(0);
 }
 
-pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt) {
+pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
     pid_t reg;
 
     reg = fork();
 
     if (reg < 0) {perror("fork"); exit(5);}
     if (reg == 0) {
-        register_routine(reg_q_cnt, i, reg_fd, reg_arr, specs, visits_cnt);
+        register_routine(reg_q_cnt, i, reg_fd, reg_arr, specs, visits_cnt, dr_limits);
     }
     return reg;
 }

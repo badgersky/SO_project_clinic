@@ -10,7 +10,7 @@
 
 # define MAX_P 20
 
-void go_to_poz(int dr_fd[6][2], int poz_id);
+void go_to_doc(int dr_fd[6][2], int dr_id);
 
 int get_dr_id();
 

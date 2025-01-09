@@ -7,21 +7,25 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, in
     *reg_q_cnt += 1;
     sem_post(reg_q);
 
-    if (visits_cnt[dr_id] < dr_limits[dr_id]) {
-    	printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
-		patient_register(reg_q_cnt, reg_fd, dr_id);
-    }
+//    printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
+	patient_register(reg_q_cnt, reg_fd, dr_id);
 
     int poz_id = 4 + rand() % 2;
     sem_wait(dr_q[poz_id]);
     if (visits_cnt[poz_id] < dr_limits[poz_id]) {
     	visits_cnt[poz_id] += 1;
-		go_to_poz(dr_fd, poz_id);
-    }
-    else {
-    	printf("visit limit for %s is reached\n", specs[poz_id]);
+		go_to_doc(dr_fd, poz_id);
     }
 	sem_post(dr_q[poz_id]);
+
+//    if (dr_id != 4 && dr_id != 5) {
+//    	sem_wait(dr_q[poz_id]);
+//        if (visits_cnt[dr_id] < dr_limits[dr_id]) {
+//        	visits_cnt[dr_id] += 1;
+//            go_to_spec(dr_fd, dr_id);
+//        }
+//        sem_post(dr_q[dr_id]);
+//    }
 
     sem_wait(door);
     *p_cnt -= 1;
@@ -29,12 +33,12 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, in
     exit(0);
 }
 
-void go_to_poz(int dr_fd[6][2], int poz_id) {
+void go_to_doc(int dr_fd[6][2], int dr_id) {
 	pid_t pid = getpid();
 
-    sem_wait(poz);
-    write(dr_fd[poz_id][1], &pid, sizeof(pid_t));
-    sem_post(poz);
+    sem_wait(doctors[dr_id]);
+    write(dr_fd[dr_id][1], &pid, sizeof(pid_t));
+    sem_post(doctors[dr_id]);
 }
 
 int get_dr_id() {
@@ -56,9 +60,7 @@ int get_dr_id() {
 
 void patient_register(int* reg_q_cnt, int reg_fd[2], int dr_id) {
 	srand(getpid());
-    pid_t pid = getpid();
-    write(reg_fd[1], &pid, sizeof(pid_t));
-    sleep(10);
+    write(reg_fd[1], &dr_id, sizeof(pid_t));
     sem_wait(reg_q);
     *reg_q_cnt -= 1;
     sem_post(reg_q);

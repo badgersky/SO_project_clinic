@@ -50,8 +50,8 @@ int main() {
 
     *p_cnt = 0;
     *reg_q_cnt = 0;
-    create_director(reg_q_cnt, reg_fd, p_cnt, reg_arr, specs, visits_cnt);
-    create_register(reg_q_cnt, 0, reg_fd, reg_arr, specs, visits_cnt);
+    create_director(reg_q_cnt, reg_fd, p_cnt, reg_arr, specs, visits_cnt, dr_limits);
+    create_register(reg_q_cnt, 0, reg_fd, reg_arr, specs, visits_cnt, dr_limits);
     for (int i = 0; i < 6; i++) {
         create_doctor(i, specs[i], dr_fd);
     }
