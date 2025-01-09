@@ -10,13 +10,15 @@
 
 # define MAX_P 20
 
+void go_to_poz(int dr_fd[6][2]);
+
 int get_dr_id();
 
-void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs);
+void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2]);
 
 void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2]);
 
-void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs);
+void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2]);
 
 void wait_patients();
 

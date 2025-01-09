@@ -1,7 +1,7 @@
 #include "register.h"
 
 pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs) {
-    printf("opening register\n");
+//    printf("opening register\n");
     pid_t pid = create_register(reg_q_cnt, 1, reg_fd, reg_arr, specs);
     sem_post(reg[1]);
     return pid;
@@ -9,7 +9,7 @@ pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs)
 
 void close_reg(int *reg_arr) {
 	if (reg_arr[1] == 1) reg_arr[1] = 0;
-    printf("closing register\n");
+//    printf("closing register\n");
     sem_wait(reg[1]);
 }
 
@@ -23,13 +23,13 @@ void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char**
     close(reg_fd[1]);
     do {
       	sem_wait(reg_q);
-        printf("patients in register queue: %d\n", *reg_q_cnt);
+//        printf("patients in register queue: %d\n", *reg_q_cnt);
         sem_post(reg_q);
 
         sem_wait(reg[i]);
 		pid_t pid;
         read(reg_fd[0], &pid, sizeof(pid_t));
-        printf("register %d registering patient %d\n", i + 1, pid);
+//        printf("register %d registering patient %d\n", i + 1, pid);
         sem_post(reg[i]);
     } while(1);
 

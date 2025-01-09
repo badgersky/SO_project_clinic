@@ -1,8 +1,8 @@
 #include "doctor.h"
 
-void doctor_routine(int type, char* spec) {
-    if (type > 3) poz_doctor_routine(spec);
-    else specialist_routine(spec);
+void doctor_routine(int type, char* spec, int dr_fd[6][2]) {
+    if (type > 3) poz_doctor_routine(spec, dr_fd[type]);
+    else specialist_routine(spec, dr_fd[type]);
 
     exit(0);
 }
@@ -12,20 +12,23 @@ void create_doctor(int type, char* spec, int dr_fd[6][2]) {
 
     if (pid < 0) {perror("fork"); exit(1);}
     if (pid == 0) {
-        doctor_routine(type, spec);
+        doctor_routine(type, spec, dr_fd);
     }
 }
 
-void poz_doctor_routine(char* spec) {
+void poz_doctor_routine(char* spec, int dr_fd[2]) {
+	close(dr_fd[1]);
     do {
-        printf("%s\n", spec);
+		pid_t pid;
+        read(dr_fd[0], &pid, sizeof(pid_t));
+        printf("%s examining patient %d\n", spec, pid);
         sleep(2);
     } while(1);
 }
 
-void specialist_routine(char* spec) {
+void specialist_routine(char* spec, int dr_fd[2]) {
     do {
-        printf("%s\n", spec);
+//        printf("%s\n", spec);
         sleep(2);
     } while(1);
 }
@@ -44,8 +47,8 @@ char** get_specializations() {
     strncpy(specs[1], "oculist", MAX_SPEC_CHAR);
     strncpy(specs[2], "pediatrist", MAX_SPEC_CHAR);
     strncpy(specs[3], "job medicine doctor", MAX_SPEC_CHAR);
-    strncpy(specs[4], "poz doctor", MAX_SPEC_CHAR);
-    strncpy(specs[5], "poz doctor", MAX_SPEC_CHAR);
+    strncpy(specs[4], "poz doctor 1", MAX_SPEC_CHAR);
+    strncpy(specs[5], "poz doctor 2", MAX_SPEC_CHAR);
 
     return specs;
 }
