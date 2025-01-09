@@ -1,8 +1,8 @@
 #include "register.h"
 
-pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs) {
+pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs, int* visits_cnt) {
 //    printf("opening register\n");
-    pid_t pid = create_register(reg_q_cnt, 1, reg_fd, reg_arr, specs);
+    pid_t pid = create_register(reg_q_cnt, 1, reg_fd, reg_arr, specs, visits_cnt);
     sem_post(reg[1]);
     return pid;
 }
@@ -18,7 +18,7 @@ int is_open_reg(int *reg_arr) {
     return 0;
 }
 
-void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs) {
+void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt) {
     srand(getpid());
     close(reg_fd[1]);
     do {
@@ -36,14 +36,14 @@ void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char**
     exit(0);
 }
 
-pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs) {
+pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt) {
     pid_t reg;
 
     reg = fork();
 
     if (reg < 0) {perror("fork"); exit(5);}
     if (reg == 0) {
-        register_routine(reg_q_cnt, i, reg_fd, reg_arr, specs);
+        register_routine(reg_q_cnt, i, reg_fd, reg_arr, specs, visits_cnt);
     }
     return reg;
 }

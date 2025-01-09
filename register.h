@@ -12,12 +12,12 @@
 
 int is_open_reg(int *reg_arr);
 
-pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs);
+pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs, int* visits_cnt);
 
 void close_reg(int *reg_arr);
 
-void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs);
+void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt);
 
-pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs);
+pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt);
 
 void wait_registers();

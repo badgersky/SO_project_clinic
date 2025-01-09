@@ -7,7 +7,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#define X1 10
+#define X1 4
 #define X2 8
 #define X3 8
 #define X4 8
