@@ -7,11 +7,11 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#define X1 4
-#define X2 2
-#define X3 2
-#define X4 2
-#define X5 2
+#define X1 20
+#define X2 8
+#define X3 8
+#define X4 8
+#define X5 8
 
 #define MAX_SPEC_CHAR 25
 

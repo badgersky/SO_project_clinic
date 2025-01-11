@@ -15,6 +15,7 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, in
     if (reg_res == 1) {
         go_to_doc(dr_fd[dr_id], dr_id);
     }
+    
     sem_wait(door);
     *p_cnt -= 1;
     sem_post(door);
