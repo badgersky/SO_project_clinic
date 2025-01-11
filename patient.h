@@ -12,3 +12,5 @@
 void patient_routine(int i);
 void create_patients();
 void wait_patients();
+void leave_clinic();
+void enter_clinic();

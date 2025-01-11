@@ -1,23 +1,31 @@
 #include "patient.h"
 
 void patient_routine(int i) {
-    sem_wait(clinic_capacity);
-
-    sem_wait(rq_lock);
-    *rq_cnt += 1;
-    sem_post(rq_lock);
+    enter_clinic();
 
     sem_wait(reg_queue);
     printf("patient %d registering\n", getpid());
     sleep(2);
     sem_post(reg_queue);
     
+    leave_clinic();
+    exit(0);
+}
+
+void enter_clinic() {
+    sem_wait(clinic_capacity);
+
+    sem_wait(rq_lock);
+    *rq_cnt += 1;
+    sem_post(rq_lock);
+}
+
+void leave_clinic() {
     sem_wait(rq_lock);
     *rq_cnt -= 1;
     sem_post(rq_lock);
 
     sem_post(clinic_capacity);
-    exit(0);
 }
 
 void create_patients() {
