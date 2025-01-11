@@ -55,7 +55,7 @@ int main() {
     for (int i = 0; i < 6; i++) {
         create_doctor(i, specs[i], dr_fd);
     }
-    create_patients(reg_q_cnt, p_cnt, reg_fd, specs, dr_fd, visits_cnt, dr_limits);
+    create_patients(reg_q_cnt, p_cnt, reg_fd, specs, dr_fd);
 
     wait_registers();
     wait_director();

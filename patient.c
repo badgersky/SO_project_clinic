@@ -1,7 +1,7 @@
 #include "patient.h"
 #include "sem.h"
 
-void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2], int* visits_cnt, int* dr_limits) {
+void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2]) {
 	int dr_id = get_dr_id();
   	int reg_res;
 
@@ -49,21 +49,26 @@ int get_dr_id() {
 int patient_register(int* reg_q_cnt, int reg_fd[2], int dr_id) {
 	srand(getpid());
     int reg_res;
-    write(reg_fd[1], &dr_id, sizeof(pid_t));
+
+    write(reg_fd[1], &dr_id, sizeof(int));
     sleep(1);
+
     read(reg_fd[0], &reg_res, sizeof(int));
     printf("patient %d register result: %d\n", getpid(), reg_res);
+    
     sem_wait(reg_q);
     *reg_q_cnt -= 1;
     sem_post(reg_q);
+
+
     return reg_res;
 }
 
-void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2], int* visits_cnt, int* dr_limits) {
+void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2]) {
 	do {
         sem_wait(door);
         if (*p_cnt < MAX_P) {
-    		create_patient(reg_q_cnt, p_cnt, reg_fd, specs, dr_fd, visits_cnt, dr_limits);
+    		create_patient(reg_q_cnt, p_cnt, reg_fd, specs, dr_fd);
             *p_cnt += 1;
         };
         sem_post(door);
@@ -71,7 +76,7 @@ void create_patients(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, in
 	} while(1);
 }
 
-void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2], int* visits_cnt, int* dr_limits) {
+void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int dr_fd[6][2]) {
     pid_t p = fork();
 
     if (p < 0) {perror("fork"); exit(3);}
@@ -79,7 +84,7 @@ void create_patient(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, int
         for (int i = 0; i < 6; i++) {
         	close(dr_fd[i][0]);
         }
-        patient_routine(reg_q_cnt, p_cnt, reg_fd, specs, dr_fd, visits_cnt, dr_limits);
+        patient_routine(reg_q_cnt, p_cnt, reg_fd, specs, dr_fd);
     }
 }
 
