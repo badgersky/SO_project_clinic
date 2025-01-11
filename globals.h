@@ -15,7 +15,13 @@ extern int visibility;
 
 extern int *rq_cnt;
 
+// clinic closing variables
+extern int *t;
+extern int *clinic_state;
+
 #endif
 
 void initialize_sem();
 void destroy_sem();
+void share_variables();
+void free_variables();

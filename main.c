@@ -6,13 +6,10 @@
 #include <stdlib.h>
 
 #include "register.h"
-#include "sem.h"
+#include "globals.h"
 #include "patient.h"
 #include "doctor.h"
 #include "director.h"
-
-void share_variables();
-void free_variables();
 
 int main() {
     initialize_sem();
@@ -20,6 +17,8 @@ int main() {
     share_variables();
 
     *rq_cnt = 0;
+    *t = 0;
+    *clinic_state = 1;
 
     create_director();
     create_registers();
@@ -33,19 +32,4 @@ int main() {
 
     destroy_sem();
     return 0;
-}
-
-void share_variables() {
-    rq_cnt = mmap(NULL, sizeof(int), protection, visibility, -1, 0);
-    if (rq_cnt == MAP_FAILED) {
-        perror("mmap");
-        exit(4);
-    }
-}
-
-void free_variables() {
-    if (munmap(rq_cnt, sizeof(sem_t)) < 0) {
-        perror("munmap");
-        exit(4);
-    } 
 }

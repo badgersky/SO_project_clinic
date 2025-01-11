@@ -11,7 +11,7 @@ void doctor_routine(int i) {
 
 void create_doctors() {
     pid_t pid;
-    for (int i = 0; i < DR_NUM; i++) {
+    for (int i = 0; i < DR_NUM - 1; i++) {
         pid = fork();
         if (pid < 0) {
             perror("fork");
@@ -24,7 +24,7 @@ void create_doctors() {
 }
 
 void wait_doctors() {
-    for (int i = 0; i < DR_NUM; i++) {
+    for (int i = 0; i < DR_NUM - 1; i++) {
         if (wait(0) < 0) {
             perror("wait");
             exit(5);
