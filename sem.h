@@ -6,9 +6,10 @@
 #ifndef SEM_H
 #define SEM_H
 
-extern sem_t *door;
-extern sem_t *reg_q;
-extern sem_t *reg[2];
+extern sem_t* p_limit;
+extern sem_t* door;
+extern sem_t* reg_q;
+extern sem_t* reg[2];
 extern sem_t* doctors[4];
 extern sem_t* poz;
 extern sem_t* dr_q[6];

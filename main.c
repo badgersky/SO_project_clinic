@@ -42,8 +42,6 @@ int main() {
     	if (pipe(dr_fd[i]) < 0) {perror("pipe"); exit(6);}
     }
 
-    
-
     int* p_cnt = (int*) mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     if (p_cnt == MAP_FAILED) {perror("mmap"); exit(6);}
     int* reg_q_cnt = (int*) mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);

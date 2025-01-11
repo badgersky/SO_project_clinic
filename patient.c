@@ -2,6 +2,7 @@
 #include "sem.h"
 
 void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], int resp_fd[2], char** specs, int dr_fd[6][2]) {
+    sem_wait(p_limit);
 	int dr_id = get_dr_id();
   	int reg_res;
 
@@ -19,6 +20,7 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], int resp_fd[2], 
     sem_wait(door);
     *p_cnt -= 1;
     sem_post(door);
+    sem_post(p_limit);
     exit(0);
 }
 
