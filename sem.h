@@ -7,6 +7,11 @@
 #define SEM_H
 
 extern sem_t* reg_queue;
+extern sem_t* rq_lock;
+extern sem_t* clinic_capacity;
+
+extern int protection;
+extern int visibility;
 
 #endif
 
