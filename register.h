@@ -6,3 +6,7 @@
 #include <stdlib.h>
 
 #define REG_NUM 2
+
+void create_registers();
+void wait_registers();
+void register_routine(int i);
