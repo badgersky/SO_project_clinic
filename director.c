@@ -3,10 +3,22 @@
 void director_routine() {
     do {
         printf("director\n");
+        *t += 1;
+        if (*t >= TK) {
+            close_clinic();
+            break;
+        }
         sleep(3);
     } while(1);
 
     exit(0);
+}
+
+void close_clinic() {
+    if (*clinic_state == 1) {
+        printf("closing clinic\n");
+        *clinic_state = 0;
+    }
 }
 
 void create_director() {

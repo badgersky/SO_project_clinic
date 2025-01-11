@@ -13,7 +13,6 @@
 
 int main() {
     initialize_sem();
-
     share_variables();
 
     *rq_cnt = 0;
@@ -30,6 +29,7 @@ int main() {
     wait_registers();
     wait_director();
 
+    free_variables();
     destroy_sem();
     return 0;
 }
