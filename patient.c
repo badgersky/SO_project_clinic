@@ -9,8 +9,8 @@ void patient_routine(int* reg_q_cnt, int* p_cnt, int reg_fd[2], char** specs, in
     *reg_q_cnt += 1;
     sem_post(reg_q);
 
-//    printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
-	reg_res = patient_register(reg_q_cnt, reg_fd, dr_id);
+    printf("patient %d registering to %s\n", getpid(), specs[dr_id]);
+    reg_res = patient_register(reg_q_cnt, reg_fd, dr_id);
 
     if (reg_res == 1) {
         go_to_doc(dr_fd[dr_id], dr_id);
