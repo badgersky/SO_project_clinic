@@ -5,12 +5,14 @@
 #include <stdlib.h>
 #include <semaphore.h>
 
+#include "sem.h"
+
 #ifndef PATIENT_H
 #define PATIENT_H
 
 # define MAX_P 20
 
-void go_to_doc(int dr_fd[2], int dr_id);
+void go_to_doc(int dr_fd[2], int dr_id, int resp_fd[2]);
 
 int get_dr_id();
 

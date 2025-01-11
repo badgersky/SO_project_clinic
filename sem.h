@@ -15,6 +15,9 @@ extern sem_t* poz;
 extern sem_t* dr_q[6];
 extern sem_t* reg_r_p;
 extern sem_t* reg_w_p;
+extern sem_t* dr_resp;
+extern sem_t* dr_w; 
+extern sem_t* pat_r;
 
 #endif
 

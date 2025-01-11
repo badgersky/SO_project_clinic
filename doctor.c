@@ -1,27 +1,39 @@
 #include "doctor.h"
 
-void doctor_routine(int type, char* spec, int dr_fd[6][2]) {
-    if (type > 3) poz_doctor_routine(spec, dr_fd[type]);
+void doctor_routine(int type, char* spec, int dr_fd[6][2], int resp_fd[2], int* dr_limits) {
+    if (type > 3) poz_doctor_routine(type, spec, dr_fd[type], resp_fd, dr_limits);
     else specialist_routine(spec, dr_fd[type]);
 
     exit(0);
 }
 
-void create_doctor(int type, char* spec, int dr_fd[6][2]) {
+void create_doctor(int type, char* spec, int dr_fd[6][2], int resp_fd[2], int* dr_limits) {
     pid_t pid = fork();
 
     if (pid < 0) {perror("fork"); exit(1);}
     if (pid == 0) {
-        doctor_routine(type, spec, dr_fd);
+        doctor_routine(type, spec, dr_fd, resp_fd, dr_limits);
     }
 }
 
-void poz_doctor_routine(char* spec, int dr_fd[2]) {
-	close(dr_fd[1]);
+void poz_doctor_routine(int id, char* spec, int dr_fd[2], int resp_fd[2], int* dr_limits) {
+	srand(getpid());
+    close(dr_fd[1]);
+    int dr_res, n, dr_id;
+
     do {
 		pid_t pid;
+        n = rand() % 10;
         read(dr_fd[0], &pid, sizeof(pid_t));
+
         printf("%s examining patient %d\n", spec, pid);
+
+        if (n < 2) {
+            dr_id = rand() % 4;
+            sem_wait(dr_w);
+            write(resp_fd[1], &dr_id, sizeof(int));
+            sem_wait(dr_w);
+        }
         sleep(2);
     } while(1);
 }
@@ -31,7 +43,7 @@ void specialist_routine(char* spec, int dr_fd[2]) {
     do {
 		pid_t pid;
         read(dr_fd[0], &pid, sizeof(pid_t));
-        printf("%s examining patient %d\n", spec, pid);
+        // printf("%s examining patient %d\n", spec, pid);
         sleep(2);
     } while(1);
 }

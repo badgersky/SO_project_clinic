@@ -6,7 +6,7 @@ void director_routine(int* reg_q_cnt, int reg_fd[2], int resp_fd[2], int* p_cnt,
     pid_t pid;
   	do {
         sem_wait(reg_q);
-        printf("director, register queue: %d\n", *reg_q_cnt);
+        // printf("director, register queue: %d\n", *reg_q_cnt);
         if (!is_open_reg(reg_arr) && *reg_q_cnt >= MAX_P / 2) {
         	pid = open_reg(reg_q_cnt, 1, reg_fd, resp_fd, reg_arr, specs, visits_cnt, dr_limits);
         }
