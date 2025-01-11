@@ -11,3 +11,4 @@ extern sem_t* reg_queue;
 #endif
 
 void initialize_sem();
+void destroy_sem();

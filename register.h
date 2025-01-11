@@ -9,4 +9,4 @@
 
 void create_registers();
 void wait_registers();
-void register_routine(int i);
+void register_routine();
