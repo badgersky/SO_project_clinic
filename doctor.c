@@ -3,7 +3,10 @@
 void doctor_routine(int i) {
     do {
         printf("doctor %d\n", i);
+        sleep(1);
     } while(1);
+
+    exit(0);
 }
 
 void create_doctors() {

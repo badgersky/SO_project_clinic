@@ -9,6 +9,7 @@
 #include "sem.h"
 #include "patient.h"
 #include "doctor.h"
+#include "director.h"
 
 void share_variables();
 void free_variables();
@@ -20,13 +21,15 @@ int main() {
 
     *rq_cnt = 0;
 
+    create_director();
     create_registers();
     create_doctors();
     create_patients();
 
-    wait_registers();
-    wait_doctors();
     wait_patients();
+    wait_doctors();
+    wait_registers();
+    wait_director();
 
     destroy_sem();
     return 0;
