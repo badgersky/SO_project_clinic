@@ -1,8 +1,8 @@
 #include "register.h"
 
-pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int *reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
+pid_t open_reg(int* reg_q_cnt, int i, int reg_fd[2], int resp_fd[2], int *reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
     printf("opening register\n");
-    pid_t pid = create_register(reg_q_cnt, 1, reg_fd, reg_arr, specs, visits_cnt, dr_limits);
+    pid_t pid = create_register(reg_q_cnt, 1, reg_fd, resp_fd, reg_arr, specs, visits_cnt, dr_limits);
     reg_arr[1] = 1;
     sem_post(reg[1]);
     return pid;
@@ -19,7 +19,7 @@ int is_open_reg(int *reg_arr) {
     return 0;
 }
 
-void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
+void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int resp_fd[2], int* reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
     srand(getpid());
     int reg_res;
     do {
@@ -30,18 +30,20 @@ void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char**
         sem_wait(reg[i]);
         
         int dr_id;
+        sem_wait(reg_r_p);
         read(reg_fd[0], &dr_id, sizeof(int));
+        sem_post(reg_r_p);
 
         sem_wait(dr_q[dr_id]);
         if (visits_cnt[dr_id] < dr_limits[dr_id]) {
             visits_cnt[dr_id] += 1;
             reg_res = 1;
-            // printf("register registering patient to %s\n", specs[dr_id]);
         } else {
             reg_res = 0;
         }
-        printf("%d", reg_res);
-        write(reg_fd[1], &reg_res, sizeof(int));
+        sem_wait(reg_w_p);
+        write(resp_fd[1], &reg_res, sizeof(int));
+        sem_post(reg_w_p);
 
         sem_post(dr_q[dr_id]);
         sem_post(reg[i]);
@@ -51,14 +53,14 @@ void register_routine(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char**
     exit(0);
 }
 
-pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int* reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
+pid_t create_register(int* reg_q_cnt, int i, int reg_fd[2], int resp_fd[2], int* reg_arr, char** specs, int* visits_cnt, int* dr_limits) {
     pid_t reg;
 
     reg = fork();
 
     if (reg < 0) {perror("fork"); exit(5);}
     if (reg == 0) {
-        register_routine(reg_q_cnt, i, reg_fd, reg_arr, specs, visits_cnt, dr_limits);
+        register_routine(reg_q_cnt, i, reg_fd, resp_fd, reg_arr, specs, visits_cnt, dr_limits);
     }
     return reg;
 }
