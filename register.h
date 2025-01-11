@@ -13,3 +13,4 @@
 void create_registers();
 void wait_registers();
 void register_routine();
+void open_close_register(int* desks_open);

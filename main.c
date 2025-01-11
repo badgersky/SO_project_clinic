@@ -8,6 +8,7 @@
 #include "register.h"
 #include "sem.h"
 #include "patient.h"
+#include "doctor.h"
 
 void share_variables();
 void free_variables();
@@ -20,9 +21,11 @@ int main() {
     *rq_cnt = 0;
 
     create_registers();
+    create_doctors();
     create_patients();
 
     wait_registers();
+    wait_doctors();
     wait_patients();
 
     destroy_sem();
