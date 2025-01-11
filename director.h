@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sem.h"
+#include "globals.h"
 
 void create_director();
 void wait_director();

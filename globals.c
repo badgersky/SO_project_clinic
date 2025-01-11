@@ -1,4 +1,4 @@
-#include "sem.h"
+#include "globals.h"
 
 sem_t *reg_queue, *clinic_capacity, *rq_lock;
 

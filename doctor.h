@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sem.h"
+#include "globals.h"
 
 #define DR_NUM 6
 

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sem.h"
+#include "globals.h"
 
 #define MAX_P 100
 
