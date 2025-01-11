@@ -1,8 +1,22 @@
 #include "register.h"
 
 void register_routine() {
+    int desks_open = 1;
+
     do {
-        printf("register\n");
+        sem_wait(rq_lock);
+        if (desks_open == 1 && *rq_cnt > MAX_QUEUE / 2) {
+            printf("second register open\n");
+            sem_post(reg_queue);
+            desks_open += 1;
+        }
+        if (desks_open == 2 && *rq_cnt < MAX_QUEUE / 3) {
+            printf("second register closed\n");
+            sem_wait(reg_queue);
+            desks_open -= 1;
+        }
+        printf("Number of patients in register queue: %d\n", *rq_cnt);
+        sem_post(rq_lock);
         sleep(1);
     } while(1);
 }

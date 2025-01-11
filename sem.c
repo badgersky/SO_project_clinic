@@ -5,6 +5,8 @@ sem_t *reg_queue, *clinic_capacity, *rq_lock;
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
 
+int *rq_cnt;
+
 void initialize_sem() {
     reg_queue = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
     if (reg_queue == MAP_FAILED) {

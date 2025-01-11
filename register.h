@@ -5,7 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "sem.h"
+
 #define REG_NUM 2
+#define MAX_QUEUE 10
 
 void create_registers();
 void wait_registers();

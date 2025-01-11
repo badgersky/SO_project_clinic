@@ -9,8 +9,6 @@
 #include "sem.h"
 #include "patient.h"
 
-extern int *rq_cnt;
-
 void share_variables();
 void free_variables();
 
@@ -18,6 +16,8 @@ int main() {
     initialize_sem();
 
     share_variables();
+
+    *rq_cnt = 0;
 
     create_registers();
     create_patients();

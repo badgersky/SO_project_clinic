@@ -13,6 +13,8 @@ extern sem_t* clinic_capacity;
 extern int protection;
 extern int visibility;
 
+extern int *rq_cnt;
+
 #endif
 
 void initialize_sem();
