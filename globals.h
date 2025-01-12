@@ -42,3 +42,4 @@ void initialize_sem();
 void destroy_sem();
 void share_variables();
 void free_variables();
+void init_variables();

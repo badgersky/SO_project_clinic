@@ -29,9 +29,9 @@ void process_patient() {
     if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
         dr_p_cnt[dr_id] += 1;
         reg_resp = 1;
-        printf("registering patient to doctor %d\n", dr_id);
+        // printf("registering patient to doctor %d\n", dr_id);
     } else {
-        printf("no free visit hours to doctor %d\n", dr_id);
+        // printf("no free visit hours to doctor %d\n", dr_id);
     }
     sem_post(drq_lock[dr_id]);
 
@@ -45,16 +45,16 @@ void process_patient() {
 void open_close_register(int* desks_open) {
     sem_wait(rq_lock);
     if (*desks_open == 1 && *rq_cnt > MAX_QUEUE / 2) {
-        printf("second register open\n");
+        // printf("second register open\n");
         sem_post(reg_queue);
         *desks_open += 1;
     }
     if (*desks_open == 2 && *rq_cnt < MAX_QUEUE / 3) {
-        printf("second register closed\n");
+        // printf("second register closed\n");
         sem_wait(reg_queue);
         *desks_open -= 1;
     }
-    printf("Number of patients in register queue: %d\n", *rq_cnt);
+    // printf("Number of patients in register queue: %d\n", *rq_cnt);
     sem_post(rq_lock);
 }
 

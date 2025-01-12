@@ -2,7 +2,7 @@
 
 void patient_routine(int i) {
     srand(getpid());
-    int reg_resp, dr_id;
+    int reg_resp = 0, dr_id;
     dr_id = get_rand_id();
     enter_clinic();
 
@@ -15,12 +15,17 @@ void patient_routine(int i) {
     if (reg_resp == 0) {
         leave_clinic();
     } else {
-        // go to doctor
+        sem_wait(dr_queue[dr_id]);
+        go_to_doc(dr_id);
+        sem_post(dr_queue[dr_id]);
     }
 
-    
     leave_clinic();
     exit(0);
+}
+
+void go_to_doc(int dr_id) {
+    printf("patient %d going to doctor %d\n", getpid(), dr_id);
 }
 
 int patient_registration(int dr_id) {
@@ -38,7 +43,7 @@ int patient_registration(int dr_id) {
         perror("read");
         exit(3);
     }
-    printf("patient %d, registers response: %d\n", getpid(), reg_resp);
+    // printf("patient %d, registers response: %d\n", getpid(), reg_resp);
 
     sleep(1);
     return reg_resp;
@@ -59,6 +64,7 @@ void leave_queue() {
 }
 
 void leave_clinic() {
+    printf("patient %d leaving clinic\n", getpid());
     sem_post(clinic_capacity);
 }
 

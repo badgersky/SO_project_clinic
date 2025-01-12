@@ -2,7 +2,7 @@
 
 void doctor_routine(int i) {
     do {
-        printf("doctor %d\n", i);
+        // printf("doctor %d\n", i);
         sleep(3);
     } while(1);
 

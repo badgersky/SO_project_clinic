@@ -14,10 +14,7 @@
 int main() {
     initialize_sem();
     share_variables();
-
-    *rq_cnt = 0;
-    *t = 0;
-    *clinic_state = 1;
+    init_variables();
 
     create_director();
     create_registers();

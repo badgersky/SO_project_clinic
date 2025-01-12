@@ -2,7 +2,7 @@
 
 void director_routine() {
     do {
-        printf("director\n");
+        // printf("director\n");
         *t += 1;
         if (*t >= TK) {
             close_clinic();

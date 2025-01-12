@@ -116,6 +116,12 @@ void share_variables() {
 
     dr_limits = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
     dr_p_cnt = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
+}
+
+void init_variables() {
+    *rq_cnt = 0;
+    *t = 0;
+    *clinic_state = 1;
 
     dr_limits[0] = 3;
     dr_limits[1] = 3;
