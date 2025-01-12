@@ -7,7 +7,8 @@
 
 #include "globals.h"
 
-void create_director();
+pid_t create_director();
 void wait_director();
 void director_routine();
 void close_clinic();
+void signal_handler();

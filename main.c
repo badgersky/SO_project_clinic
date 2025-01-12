@@ -16,9 +16,9 @@ int main() {
     share_variables();
     init_variables();
 
-    create_director();
+    pid_t dir_pid = create_director();
     create_registers();
-    create_doctors();
+    create_doctors(dir_pid);
     create_patients();
 
     wait_patients();

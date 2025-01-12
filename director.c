@@ -20,7 +20,8 @@ void close_clinic() {
     }
 }
 
-void create_director() {
+pid_t create_director() {
+    signal(1, signal_handler);
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork");
@@ -36,4 +37,8 @@ void wait_director() {
         perror("wait");
         exit(6);
     }
+}
+
+void signal_handler(int) {
+    close_clinic();
 }

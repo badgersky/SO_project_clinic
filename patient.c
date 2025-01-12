@@ -4,31 +4,37 @@ void patient_routine(int i) {
     srand(getpid());
     int reg_resp = 0, dr_id, doc_resp = -1;
     dr_id = get_rand_id();
-    enter_clinic();
 
-    sem_wait(reg_queue);
-    reg_resp = patient_registration(dr_id);
-    sem_post(reg_queue);
-    
-    leave_queue();
-
-    if (reg_resp == 0) {
+    if (*clinic_state == 0) {
         leave_clinic();
     } else {
-        sem_wait(dr_queue[dr_id]);
-        doc_resp = go_to_doc(dr_id);
-        sem_post(dr_queue[dr_id]);
-    }
+        enter_clinic();
 
-    if (doc_resp < 0) {
+        sem_wait(reg_queue);
+        reg_resp = patient_registration(dr_id);
+        sem_post(reg_queue);
+
+        leave_queue();
+
+        if (reg_resp == 0) {
+            leave_clinic();
+        } else {
+            sem_wait(dr_queue[dr_id]);
+            doc_resp = go_to_doc(dr_id);
+            sem_post(dr_queue[dr_id]);
+        }
+
+        if (doc_resp < 0) {
+            leave_clinic();
+        } else {
+            sem_wait(dr_queue[doc_resp]);
+            doc_resp = go_to_doc(doc_resp);
+            sem_post(dr_queue[doc_resp]);
+        }
+
         leave_clinic();
-    } else {
-        sem_wait(dr_queue[doc_resp]);
-        doc_resp = go_to_doc(doc_resp);
-        sem_post(dr_queue[doc_resp]);
     }
-
-    leave_clinic();
+ 
 }
 
 int go_to_doc(int dr_id) {
