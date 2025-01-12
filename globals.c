@@ -168,15 +168,15 @@ void init_variables() {
 }
 
 void free_variables() {
-    if (munmap(rq_cnt, sizeof(sem_t)) < 0) {
+    if (munmap(rq_cnt, sizeof(int)) < 0) {
         perror("munmap");
         exit(4);
     }
-    if (munmap(t, sizeof(sem_t)) < 0) {
+    if (munmap(t, sizeof(int)) < 0) {
         perror("munmap");
         exit(4);
     } 
-    if (munmap(clinic_state, sizeof(sem_t)) < 0) {
+    if (munmap(clinic_state, sizeof(int)) < 0) {
         perror("munmap");
         exit(4);
     }
