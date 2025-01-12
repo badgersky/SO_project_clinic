@@ -4,19 +4,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifndef SEM_H
-#define SEM_H
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
-extern sem_t* reg_queue;
-extern sem_t* rq_lock;
-extern sem_t* clinic_capacity;
+#define DR_NUM 5
 
 extern int protection;
 extern int visibility;
 
+// entering clinic, register control, queues
+extern sem_t* reg_queue;
+extern sem_t* rq_lock;
+extern sem_t* clinic_capacity;
+
 extern int *rq_cnt;
 
-// clinic closing variables
+// clinic worktime variables
 extern int *t;
 extern int *clinic_state;
 
@@ -25,6 +28,13 @@ extern int patient_register[2];
 extern int register_patient[2];
 
 extern sem_t* reg_pipe_lock;
+
+// doctor queue control
+extern sem_t* dr_queue[5];
+extern sem_t* drq_lock[5];
+
+extern int* dr_limits;
+extern int* dr_p_cnt;
 
 #endif
 

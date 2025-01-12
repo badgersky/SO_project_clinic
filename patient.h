@@ -16,4 +16,4 @@ void wait_patients();
 void leave_clinic();
 void enter_clinic();
 void leave_queue();
-int patient_registration();
+int patient_registration(int dr_id);

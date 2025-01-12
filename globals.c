@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock;
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[5], *dr_queue[5];
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -11,6 +11,9 @@ int *clinic_state;
 
 int patient_register[2];
 int register_patient[2];
+
+int* dr_limits;
+int* dr_p_cnt;
 
 void initialize_sem() {
     reg_queue = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
@@ -34,6 +37,24 @@ void initialize_sem() {
         exit(2);
     }
 
+    for (int i = 0; i < DR_NUM; i++) {
+        drq_lock[i] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+        if (drq_lock[i] == MAP_FAILED) {
+            perror("mmap");
+            exit(2);
+        }
+        sem_init(drq_lock[i], 1, 1);
+        
+        dr_queue[i] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+        if (dr_queue[i] == MAP_FAILED) {
+            perror("mmap");
+            exit(2);
+        }
+
+        if (i == 4) { sem_init(dr_queue[i], 1, 2); } 
+        else { sem_init(dr_queue[i], 1, 1); }
+    }
+
     sem_init(reg_queue, 1, 1);
     sem_init(clinic_capacity, 1, 30);
     sem_init(rq_lock, 1, 1);
@@ -45,6 +66,20 @@ void destroy_sem() {
     sem_destroy(clinic_capacity);
     sem_destroy(rq_lock);
     sem_destroy(reg_pipe_lock);
+
+    for (int i = 0; i < DR_NUM; i++) {
+        sem_destroy(drq_lock[i]);
+        sem_destroy(dr_queue[i]);
+        if (munmap(drq_lock[i], sizeof(sem_t)) < 0) {
+            perror("munmap");
+            exit(2);
+        } 
+        
+        if (munmap(dr_queue[i], sizeof(sem_t)) < 0) {
+            perror("munmap");
+            exit(2);
+        } 
+    }
 
     if (munmap(reg_queue, sizeof(sem_t)) < 0) {
         perror("munmap");
@@ -79,6 +114,19 @@ void share_variables() {
     if (clinic_state == MAP_FAILED) {
         perror("mmap");
         exit(4);
+    }
+
+    dr_limits = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
+    dr_p_cnt = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
+
+    dr_limits[0] = 10;
+    dr_limits[1] = 10;
+    dr_limits[2] = 10;
+    dr_limits[3] = 10;
+    dr_limits[4] = 20;
+
+    for (int i = 0; i < DR_NUM; i++) {
+        dr_p_cnt[i] = 0;
     }
 
     pipe(patient_register);

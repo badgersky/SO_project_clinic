@@ -8,8 +8,6 @@
 
 #include "globals.h"
 
-#define DR_NUM 5
-
 void create_doctors();
 void wait_doctors();
 void doctor_routine(int i);

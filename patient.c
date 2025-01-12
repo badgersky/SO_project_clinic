@@ -1,11 +1,12 @@
 #include "patient.h"
 
 void patient_routine(int i) {
-    int reg_resp;
+    int reg_resp, dr_id;
+    dr_id = get_rand_id();
     enter_clinic();
 
     sem_wait(reg_queue);
-    reg_resp = patient_registration();
+    reg_resp = patient_registration(dr_id);
     sem_post(reg_queue);
     
     leave_queue();
@@ -13,11 +14,10 @@ void patient_routine(int i) {
     exit(0);
 }
 
-int patient_registration() {
+int patient_registration(int dr_id) {
     srand(getpid());
     printf("patient %d registering\n", getpid());
-    int reg_resp, dr_id;
-    dr_id = get_rand_id();
+    int reg_resp;
 
     close(patient_register[0]);
     close(register_patient[1]);
