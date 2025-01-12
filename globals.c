@@ -137,12 +137,12 @@ void init_variables() {
     *t = 0;
     *clinic_state = 1;
 
-    dr_limits[0] = 3;
-    dr_limits[1] = 3;
-    dr_limits[2] = 3;
-    dr_limits[3] = 3;
-    dr_limits[4] = 8;
-    dr_limits[5] = 8;
+    dr_limits[0] = 10;
+    dr_limits[1] = 10;
+    dr_limits[2] = 10;
+    dr_limits[3] = 10;
+    dr_limits[4] = 20;
+    dr_limits[5] = 20;
 
     for (int i = 0; i < DR_NUM; i++) {
         dr_p_cnt[i] = 0;

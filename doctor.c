@@ -13,7 +13,15 @@ void doctor_routine(int i) {
 void examine_patient(int dr_id) {
     pid_t p_pid;
     int doc_resp = -1;
+    int r = rand() % 10;
+    int spec_id = -1;
 
+    if (r < 2) {
+        if (dr_id == 4 || dr_id == 5) {
+            spec_id = rand() % DR_NUM - 2;
+        }
+    }
+    
     close(patient_doctor[dr_id][1]);
     close(doctor_patient[dr_id][0]);
 
@@ -23,7 +31,20 @@ void examine_patient(int dr_id) {
         perror("read");
         exit(5);
     }
+
     printf("Doctor %d examining patient %d\n", dr_id, p_pid);
+    if (spec_id >= 0 && spec_id <= 3) {
+        sem_wait(drq_lock[dr_id]);
+        if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
+            dr_p_cnt[dr_id] += 1;
+            doc_resp = spec_id;
+            printf("Doctor %d registering patient %d to doctor %d\n", dr_id, p_pid, spec_id);
+        } else {
+            printf("no free visit hours to doctor %d\n", dr_id);
+        }
+        sem_post(drq_lock[dr_id]);
+    } 
+    
     if (write(doctor_patient[dr_id][1], &doc_resp, sizeof(int)) < 0) {
         perror("write");
         exit(5);
