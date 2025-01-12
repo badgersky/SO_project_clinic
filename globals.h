@@ -36,6 +36,12 @@ extern sem_t* drq_lock[6];
 extern int* dr_limits;
 extern int* dr_p_cnt;
 
+// communication between doctors and patients
+extern int patient_doctor[6][2];
+extern int doctor_patient[6][2];
+
+extern sem_t* dr_pipe_lock[6];
+
 #endif
 
 void initialize_sem();

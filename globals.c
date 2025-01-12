@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6];
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6];
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -14,6 +14,9 @@ int register_patient[2];
 
 int* dr_limits;
 int* dr_p_cnt;
+
+int patient_doctor[6][2];
+int doctor_patient[6][2];
 
 void initialize_sem() {
     reg_queue = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
@@ -51,6 +54,13 @@ void initialize_sem() {
             exit(2);
         }
         sem_init(dr_queue[i], 1, 1);
+
+        dr_pipe_lock[i] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+        if (dr_pipe_lock[i] == MAP_FAILED) {
+            perror("mmap");
+            exit(2);
+        }
+        sem_init(dr_pipe_lock[i], 1, 1);
     }
 
     sem_init(reg_queue, 1, 1);
@@ -68,12 +78,16 @@ void destroy_sem() {
     for (int i = 0; i < DR_NUM; i++) {
         sem_destroy(drq_lock[i]);
         sem_destroy(dr_queue[i]);
+        sem_destroy(dr_pipe_lock[i]);
         if (munmap(drq_lock[i], sizeof(sem_t)) < 0) {
             perror("munmap");
             exit(2);
         } 
-        
         if (munmap(dr_queue[i], sizeof(sem_t)) < 0) {
+            perror("munmap");
+            exit(2);
+        } 
+        if (munmap(dr_pipe_lock[i], sizeof(sem_t)) < 0) {
             perror("munmap");
             exit(2);
         } 
@@ -132,10 +146,25 @@ void init_variables() {
 
     for (int i = 0; i < DR_NUM; i++) {
         dr_p_cnt[i] = 0;
+
+        if (pipe(patient_doctor[i]) < 0) {
+            perror("pipe");
+            exit(4);
+        }
+        if (pipe(doctor_patient[i]) < 0) {
+            perror("pipe");
+            exit(4);
+        }
     }
 
-    pipe(patient_register);
-    pipe(register_patient);
+    if (pipe(patient_register) < 0) {
+        perror("pipe");
+        exit(4);
+    }
+    if (pipe(register_patient) < 0) {
+        perror("pipe");
+        exit(4);
+    }
 }
 
 void free_variables() {
@@ -150,6 +179,13 @@ void free_variables() {
     if (munmap(clinic_state, sizeof(sem_t)) < 0) {
         perror("munmap");
         exit(4);
+    }
+
+    for (int i = 0; i < DR_NUM; i++) {
+        close(patient_doctor[i][0]);
+        close(patient_doctor[i][1]);
+        close(doctor_patient[i][0]);
+        close(doctor_patient[i][1]);
     }
 
     close(patient_register[1]);
