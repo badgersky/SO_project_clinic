@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6];
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock;
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -17,6 +17,8 @@ int* dr_p_cnt;
 
 int patient_doctor[6][2];
 int doctor_patient[6][2];
+
+FILE* report;
 
 void initialize_sem() {
     reg_queue = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
@@ -36,6 +38,11 @@ void initialize_sem() {
     }
     reg_pipe_lock = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
     if (reg_pipe_lock == MAP_FAILED) {
+        perror("mmap");
+        exit(2);
+    }
+    report_lock = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+    if (report_lock == MAP_FAILED) {
         perror("mmap");
         exit(2);
     }
@@ -67,6 +74,7 @@ void initialize_sem() {
     sem_init(clinic_capacity, 1, 30);
     sem_init(rq_lock, 1, 1);
     sem_init(reg_pipe_lock, 1, 1);
+    sem_init(report_lock, 1, 1);
 }
 
 void destroy_sem() {
@@ -74,6 +82,7 @@ void destroy_sem() {
     sem_destroy(clinic_capacity);
     sem_destroy(rq_lock);
     sem_destroy(reg_pipe_lock);
+    sem_destroy(report_lock);
 
     for (int i = 0; i < DR_NUM; i++) {
         sem_destroy(drq_lock[i]);
@@ -109,6 +118,10 @@ void destroy_sem() {
         perror("munmap");
         exit(2);
     } 
+    if (munmap(report_lock, sizeof(sem_t)) < 0) {
+        perror("munmap");
+        exit(2);
+    } 
 }
 
 void share_variables() {
@@ -132,17 +145,41 @@ void share_variables() {
     dr_p_cnt = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
 }
 
+void open_report() {
+    report = fopen("daily_report", "a");
+    if (report == NULL) {
+        perror("fopen");
+        exit(4);
+    }
+}
+
+void write_report(char* msg) {
+    size_t saved_b;
+    open_report();
+    saved_b = fwrite(msg, sizeof(char), strlen(msg), report);
+    close_report();
+}
+
+void close_report() {
+    if (fclose(report) != 0) {
+        perror("fclose");
+        exit(4);
+    }
+
+    report = NULL;
+}
+
 void init_variables() {
     *rq_cnt = 0;
     *t = 0;
     *clinic_state = 1;
 
-    dr_limits[0] = 3;
-    dr_limits[1] = 3;
-    dr_limits[2] = 3;
-    dr_limits[3] = 3;
-    dr_limits[4] = 8;
-    dr_limits[5] = 8;
+    dr_limits[0] = 0;
+    dr_limits[1] = 0;
+    dr_limits[2] = 0;
+    dr_limits[3] = 0;
+    dr_limits[4] = 20;
+    dr_limits[5] = 20;
 
     for (int i = 0; i < DR_NUM; i++) {
         dr_p_cnt[i] = 0;

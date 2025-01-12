@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -12,6 +13,8 @@
 
 #define TP 0
 #define TK 100
+
+#define BUFFER 100
 
 extern int protection;
 extern int visibility;
@@ -46,6 +49,10 @@ extern int doctor_patient[6][2];
 
 extern sem_t* dr_pipe_lock[6];
 
+// daily report
+extern FILE *report;
+extern sem_t* report_lock;
+
 #endif
 
 void initialize_sem();
@@ -53,3 +60,6 @@ void destroy_sem();
 void share_variables();
 void free_variables();
 void init_variables();
+void open_report();
+void close_report();
+void write_report(char* msg);

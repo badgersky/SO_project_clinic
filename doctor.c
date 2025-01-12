@@ -38,7 +38,12 @@ void examine_patient(int dr_id) {
             dr_p_cnt[dr_id] += 1;
             printf("Doctor %d registering patient %d to doctor %d\n", dr_id, p_pid, spec_id);
         } else {
-            printf("no free visit hours to doctor %d\n", dr_id);
+            char* msg = (char*) malloc(sizeof(char) * BUFFER);
+            sprintf(msg, "%d - skierowanie do %d - wystawił doktor %d\n", p_pid, spec_id, dr_id);
+            sem_wait(report_lock);
+            write_report(msg);
+            sem_post(report_lock);
+            free(msg);
         }
         sem_post(drq_lock[dr_id]);
     } 
@@ -50,8 +55,6 @@ void examine_patient(int dr_id) {
 
     sem_post(dr_pipe_lock[dr_id]);
 }
-
-void send
 
 void create_doctors() {
     pid_t pid;
