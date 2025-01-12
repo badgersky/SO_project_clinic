@@ -26,6 +26,22 @@ void patient_routine(int i) {
 
 void go_to_doc(int dr_id) {
     printf("patient %d going to doctor %d\n", getpid(), dr_id);
+    int doc_resp;
+    pid_t pid = getpid();
+
+    close(patient_doctor[dr_id][0]);
+    close(doctor_patient[dr_id][1]);
+
+    if (write(patient_doctor[dr_id][1], &pid, sizeof(pid_t)) < 0) {
+        perror("write");
+        exit(3);
+    }
+    if (read(doctor_patient[dr_id][0], &doc_resp, sizeof(int)) < 0) {
+        perror("read");
+        exit(3);
+    }
+
+    printf("patient %d, doctors response: %d\n", pid, doc_resp);
 }
 
 int patient_registration(int dr_id) {
@@ -43,7 +59,7 @@ int patient_registration(int dr_id) {
         perror("read");
         exit(3);
     }
-    // printf("patient %d, registers response: %d\n", getpid(), reg_resp);
+    printf("patient %d, registers response: %d\n", getpid(), reg_resp);
 
     sleep(1);
     return reg_resp;

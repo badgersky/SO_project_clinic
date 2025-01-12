@@ -12,3 +12,4 @@ void create_doctors();
 void wait_doctors();
 void doctor_routine(int i);
 int get_rand_id();
+void examine_patient(int dr_id);

@@ -3,10 +3,33 @@
 void doctor_routine(int i) {
     do {
         // printf("doctor %d\n", i);
+        examine_patient(i);
         sleep(3);
     } while(1);
 
     exit(0);
+}
+
+void examine_patient(int dr_id) {
+    pid_t p_pid;
+    int doc_resp = -1;
+
+    close(patient_doctor[dr_id][1]);
+    close(doctor_patient[dr_id][0]);
+
+    sem_wait(dr_pipe_lock[dr_id]);
+
+    if (read(patient_doctor[dr_id][0], &p_pid, sizeof(pid_t)) < 0) {
+        perror("read");
+        exit(5);
+    }
+    printf("Doctor %d examining patient %d\n", dr_id, p_pid);
+    if (write(doctor_patient[dr_id][1], &doc_resp, sizeof(int)) < 0) {
+        perror("write");
+        exit(5);
+    }
+
+    sem_post(dr_pipe_lock[dr_id]);
 }
 
 void create_doctors() {
