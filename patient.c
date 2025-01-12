@@ -6,7 +6,7 @@ void patient_routine(int i) {
     dr_id = get_rand_id();
 
     if (*clinic_state == 0) {
-        leave_clinic();
+        exit(0);
     } else {
         enter_clinic();
 
@@ -61,10 +61,15 @@ int go_to_doc(int dr_id) {
 int patient_registration(int dr_id) {
     printf("patient %d registering\n", getpid());
     int reg_resp;
+    pid_t pid = getpid();
 
     close(patient_register[0]);
     close(register_patient[1]);
 
+    if (write(patient_register[1], &pid, sizeof(pid_t)) < 0) {
+        perror("write");
+        exit(3);
+    }
     if (write(patient_register[1], &dr_id, sizeof(int)) < 0) {
         perror("write");
         exit(3);

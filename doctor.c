@@ -3,7 +3,7 @@
 void doctor_routine(int i, pid_t dir_pid) {
     do {
         // printf("doctor %d\n", i);
-        check_limits();
+        check_limits(dir_pid);
         examine_patient(i);
         sleep(3);
     } while(1);
@@ -95,9 +95,14 @@ int get_rand_id() {
 }
 
 void check_limits(pid_t dir_pid) {
+    int full = 1;
     for (int i = 0; i < DR_NUM; i++) {
-        if (dr_p_cnt[i] >= dr_limits[i]) {
-            kill(dir_pid, 1);
+        if (dr_p_cnt[i] < dr_limits[i]) {
+            full = 0;
         }
+    }
+
+    if (full) {
+        kill(dir_pid, 1);
     }
 }

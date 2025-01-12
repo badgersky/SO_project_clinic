@@ -174,10 +174,10 @@ void init_variables() {
     *t = 0;
     *clinic_state = 1;
 
-    dr_limits[0] = 0;
-    dr_limits[1] = 0;
-    dr_limits[2] = 0;
-    dr_limits[3] = 0;
+    dr_limits[0] = 10;
+    dr_limits[1] = 10;
+    dr_limits[2] = 10;
+    dr_limits[3] = 10;
     dr_limits[4] = 20;
     dr_limits[5] = 20;
 

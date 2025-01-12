@@ -16,24 +16,38 @@ void register_routine() {
 
 void process_patient() {
     int dr_id, reg_resp = 0;
+    pid_t p_pid;
     close(register_patient[0]);
     close(patient_register[1]);
 
     sem_wait(reg_pipe_lock);
+    if (read(patient_register[0], &p_pid, sizeof(int)) < 0) {
+        perror("read");
+        exit(3);
+    }
     if (read(patient_register[0], &dr_id, sizeof(int)) < 0) {
         perror("read");
         exit(3);
     }
 
-    sem_wait(drq_lock[dr_id]);
-    if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
-        dr_p_cnt[dr_id] += 1;
-        reg_resp = 1;
-        printf("registering patient to doctor %d\n", dr_id);
+    if (*clinic_state == 0) {
+        char* msg = (char*) malloc(sizeof(char) * BUFFER);
+        sprintf(msg, "%d - skierowanie do %d - wystawiła rejestracja\n", p_pid, dr_id);
+        sem_wait(report_lock);
+        write_report(msg);
+        sem_post(report_lock);
+        free(msg);
     } else {
-        printf("no free visit hours to doctor %d\n", dr_id);
+        sem_wait(drq_lock[dr_id]);
+        if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
+            dr_p_cnt[dr_id] += 1;
+            reg_resp = 1;
+            printf("registering patient %d to doctor %d\n", p_pid, dr_id);
+        } else {
+            printf("no free visit hours to doctor %d\n", dr_id);
+        }
+        sem_post(drq_lock[dr_id]);
     }
-    sem_post(drq_lock[dr_id]);
 
     if (write(register_patient[1], &reg_resp, sizeof(int)) < 0) {
         perror("write");
@@ -54,7 +68,7 @@ void open_close_register(int* desks_open) {
         sem_wait(reg_queue);
         *desks_open -= 1;
     }
-    printf("Number of patients in register queue: %d\n", *rq_cnt);
+    // printf("Number of patients in register queue: %d\n", *rq_cnt);
     sem_post(rq_lock);
 }
 
