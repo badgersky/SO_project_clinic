@@ -44,3 +44,36 @@ zamknięciem przychodni. Dane pacjentów (id - skierowanie do …. - wystawił),
 przyjęci powinny zostać zapisane w raporcie dziennym.
 Na polecenie Dyrektora (sygnał 2) wszyscy pacjenci natychmiast opuszczają budynek.
 Napisz procedury Dyrektor, Rejestracja, Lekarz i Pacjent symulujące działanie przychodni
+
+###Topic 15 - clinic
+In the clinic, patients are attended by two general practitioners (GPs) and doctors with specialties:
+cardiologist, ophthalmologist, pediatrician, and occupational medicine doctor. Each doctor in a given
+day can attend to a specific number of patients: each GP can see X1 people, cardiologist X2 people,
+ophthalmologist X3 people, pediatrician X4 people, occupational medicine doctor X5 people. GPs attend to
+about 60% of all patients (a random value), each specialist attends to about 10% of all patients (a random value).
+Both GPs share one common queue of patients, and each specialist has their own individual queue.
+GPs refer some patients (about 20% of X1) for additional consultations to designated specialists – the patient
+is registered to the specialist by the GP. If that specialist has no more available slots, the patient’s
+data (id - referral to …. - issued by) should be recorded in the daily report. Specialists can also refer
+a patient (about 10%) for an outpatient test, after which the patient returns to the given specialist and 
+enters the office without waiting in line (after the current patient leaves). If, at the clinic’s closing
+time, there are still patients waiting in a doctor’s queue, those patients will be seen on that day but
+cannot be referred for additional consultations.
+The rules for the clinic, as established by the Director, are as follows:
+- The clinic is open from Tp to Tk;
+- At any given moment, no more than N patients can be inside the clinic (others, if any, must wait outside);
+- Children under the age of 18 must be accompanied by an adult to the clinic;
+- Every patient must go to registration before visiting a doctor;
+- There are 2 registration windows, with at least 1 always open;
+- If there are more than K patients (K >= N/2) in the queue for registration, the second window opens.
+- The second window closes if the number of patients in the registration queue drops below N/3;
+- VIP patients (e.g., honorary blood donors) can enter the doctor’s office without waiting in line;
+- If a doctor’s appointment slots are fully booked, those patients will not be admitted (registered);
+- If all doctors’ appointment slots are fully booked for the day, patients are not allowed to enter the building;
+- If, at the clinic’s closing time, there are still patients in the registration queue, they will not be seen that
+- day by any doctor. The data of these patients (id - referral to … - issued by) should be recorded in the daily report.
+
+On the Director’s order (signal 1), a given doctor examines the current patient and finishes work before the clinic
+closes. The data of patients (id - referral to …. - issued by) who were not seen should be recorded in the daily report.
+On the Director’s order (signal 2), all patients immediately leave the building.
+Write the procedures for Director, Registration, Doctor, and Patient to simulate the operation of the clinic.
