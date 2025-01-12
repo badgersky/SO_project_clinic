@@ -50,9 +50,7 @@ void initialize_sem() {
             perror("mmap");
             exit(2);
         }
-
-        if (i == 4) { sem_init(dr_queue[i], 1, 2); } 
-        else { sem_init(dr_queue[i], 1, 1); }
+        sem_init(dr_queue[i], 1, 1);
     }
 
     sem_init(reg_queue, 1, 1);
@@ -124,6 +122,7 @@ void share_variables() {
     dr_limits[2] = 10;
     dr_limits[3] = 10;
     dr_limits[4] = 20;
+    dr_limits[5] = 20;
 
     for (int i = 0; i < DR_NUM; i++) {
         dr_p_cnt[i] = 0;

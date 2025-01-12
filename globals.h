@@ -7,7 +7,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#define DR_NUM 5
+#define DR_NUM 6
 
 extern int protection;
 extern int visibility;

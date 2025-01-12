@@ -2,8 +2,8 @@
 
 void doctor_routine(int i) {
     do {
-        // printf("doctor %d\n", i);
-        sleep(1);
+        printf("doctor %d\n", i);
+        sleep(3);
     } while(1);
 
     exit(0);
@@ -35,10 +35,13 @@ void wait_doctors() {
 
 int get_rand_id() {
     int r = rand() % 10;
+    int dr_id;
     if (r < 6) {
-        return 4;
+        dr_id = 4 + (rand() % 2);
     }
-
-    int dr_id = rand() % (DR_NUM - 1);
+    else {
+        dr_id = rand() % (DR_NUM - 2);
+    }
+    
     return dr_id;
 }

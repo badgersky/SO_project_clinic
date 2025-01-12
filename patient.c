@@ -1,6 +1,7 @@
 #include "patient.h"
 
 void patient_routine(int i) {
+    srand(getpid());
     int reg_resp, dr_id;
     dr_id = get_rand_id();
     enter_clinic();
@@ -15,7 +16,6 @@ void patient_routine(int i) {
 }
 
 int patient_registration(int dr_id) {
-    srand(getpid());
     printf("patient %d registering\n", getpid());
     int reg_resp;
 
