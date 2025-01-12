@@ -11,6 +11,14 @@ void patient_routine(int i) {
     sem_post(reg_queue);
     
     leave_queue();
+
+    if (reg_resp == 0) {
+        leave_clinic();
+    } else {
+        // go to doctor
+    }
+
+    
     leave_clinic();
     exit(0);
 }

@@ -15,7 +15,7 @@ void register_routine() {
 }
 
 void process_patient() {
-    int dr_id, reg_resp;
+    int dr_id, reg_resp = 0;
     close(register_patient[0]);
     close(patient_register[1]);
 
@@ -24,8 +24,17 @@ void process_patient() {
         perror("read");
         exit(3);
     }
-    printf("registering patient to doctor %d\n", dr_id);
-    reg_resp = 0;
+
+    sem_wait(drq_lock[dr_id]);
+    if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
+        dr_p_cnt[dr_id] += 1;
+        reg_resp = 1;
+        printf("registering patient to doctor %d\n", dr_id);
+    } else {
+        printf("no free visit hours to doctor %d\n", dr_id);
+    }
+    sem_post(drq_lock[dr_id]);
+
     if (write(register_patient[1], &reg_resp, sizeof(int)) < 0) {
         perror("write");
         exit(3);

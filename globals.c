@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[5], *dr_queue[5];
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6];
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -117,12 +117,12 @@ void share_variables() {
     dr_limits = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
     dr_p_cnt = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
 
-    dr_limits[0] = 10;
-    dr_limits[1] = 10;
-    dr_limits[2] = 10;
-    dr_limits[3] = 10;
-    dr_limits[4] = 20;
-    dr_limits[5] = 20;
+    dr_limits[0] = 3;
+    dr_limits[1] = 3;
+    dr_limits[2] = 3;
+    dr_limits[3] = 3;
+    dr_limits[4] = 8;
+    dr_limits[5] = 8;
 
     for (int i = 0; i < DR_NUM; i++) {
         dr_p_cnt[i] = 0;

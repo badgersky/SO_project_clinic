@@ -30,8 +30,8 @@ extern int register_patient[2];
 extern sem_t* reg_pipe_lock;
 
 // doctor queue control
-extern sem_t* dr_queue[5];
-extern sem_t* drq_lock[5];
+extern sem_t* dr_queue[6];
+extern sem_t* drq_lock[6];
 
 extern int* dr_limits;
 extern int* dr_p_cnt;
