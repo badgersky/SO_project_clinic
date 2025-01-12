@@ -8,8 +8,6 @@
 #include "globals.h"
 #include "doctor.h"
 
-#define MAX_P 100
-
 void patient_routine(int i);
 void create_patients();
 void wait_patients();

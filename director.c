@@ -6,7 +6,6 @@ void director_routine() {
         *t += 1;
         if (*t >= TK) {
             close_clinic();
-            break;
         }
         sleep(3);
     } while(1);

@@ -8,6 +8,10 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
+#define MAX_P 40
+
+#define TP 0
+#define TK 100
 
 extern int protection;
 extern int visibility;
