@@ -2,6 +2,7 @@
 #include <sys/mman.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #ifndef SEM_H
 #define SEM_H
@@ -18,6 +19,12 @@ extern int *rq_cnt;
 // clinic closing variables
 extern int *t;
 extern int *clinic_state;
+
+// communication between register and patients
+extern int patient_register[2];
+extern int register_patient[2];
+
+extern sem_t* reg_pipe_lock;
 
 #endif
 

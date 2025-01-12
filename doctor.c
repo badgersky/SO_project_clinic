@@ -2,7 +2,7 @@
 
 void doctor_routine(int i) {
     do {
-        printf("doctor %d\n", i);
+        // printf("doctor %d\n", i);
         sleep(1);
     } while(1);
 
@@ -11,23 +11,34 @@ void doctor_routine(int i) {
 
 void create_doctors() {
     pid_t pid;
-    for (int i = 0; i < DR_NUM - 1; i++) {
+    for (int i = 0; i < DR_NUM; i++) {
         pid = fork();
         if (pid < 0) {
             perror("fork");
             exit(5);
         }
         if (pid == 0) {
+            srand(time(0) + i);
             doctor_routine(i);
         }
     }
 }
 
 void wait_doctors() {
-    for (int i = 0; i < DR_NUM - 1; i++) {
+    for (int i = 0; i < DR_NUM; i++) {
         if (wait(0) < 0) {
             perror("wait");
             exit(5);
         }
     }
+}
+
+int get_rand_id() {
+    int r = rand() % 10;
+    if (r < 6) {
+        return 4;
+    }
+
+    int dr_id = rand() % (DR_NUM - 1);
+    return dr_id;
 }

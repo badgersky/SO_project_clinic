@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "globals.h"
+#include "doctor.h"
 
 #define MAX_P 100
 
@@ -14,3 +15,5 @@ void create_patients();
 void wait_patients();
 void leave_clinic();
 void enter_clinic();
+void leave_queue();
+int patient_registration();

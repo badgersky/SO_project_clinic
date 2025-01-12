@@ -6,11 +6,31 @@ void register_routine() {
 
     do {
         open_close_register(desks_open);
+        process_patient();
         sleep(1);
     } while(1);
 
     free(desks_open);
     exit(0);
+}
+
+void process_patient() {
+    int dr_id, reg_resp;
+    close(register_patient[0]);
+    close(patient_register[1]);
+
+    sem_wait(reg_pipe_lock);
+    if (read(patient_register[0], &dr_id, sizeof(int)) < 0) {
+        perror("read");
+        exit(3);
+    }
+    printf("registering patient to doctor %d\n", dr_id);
+    reg_resp = 0;
+    if (write(register_patient[1], &reg_resp, sizeof(int)) < 0) {
+        perror("write");
+        exit(3);
+    }
+    sem_post(reg_pipe_lock);
 }
 
 void open_close_register(int* desks_open) {

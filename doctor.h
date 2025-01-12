@@ -4,11 +4,13 @@
 #include <sys/mman.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "globals.h"
 
-#define DR_NUM 6
+#define DR_NUM 5
 
 void create_doctors();
 void wait_doctors();
 void doctor_routine(int i);
+int get_rand_id();
