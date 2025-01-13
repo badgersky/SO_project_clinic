@@ -7,9 +7,6 @@
 
 #include "globals.h"
 
-#define REG_NUM 2
-#define MAX_QUEUE 10
-
 void create_registers();
 void wait_registers();
 void register_routine();

@@ -8,9 +8,9 @@
 
 #include "globals.h"
 
-void create_doctors(pid_t dir_pid);
+void create_doctors();
 void wait_doctors();
-void doctor_routine(int i, pid_t dir_pid);
+void doctor_routine(int i);
 int get_rand_id();
 void examine_patient(int dr_id);
-void check_limits(pid_t dir_pid);
+int check_limits();

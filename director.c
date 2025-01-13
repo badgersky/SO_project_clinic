@@ -1,8 +1,15 @@
 #include "director.h"
 
 void director_routine() {
+    int full;
+    
     do {
         // printf("director\n");
+        full = check_limits();
+        if (full == 1) {
+            close_clinic();
+        }
+
         *t += 1;
         if (*t >= TK) {
             close_clinic();
@@ -20,8 +27,7 @@ void close_clinic() {
     }
 }
 
-pid_t create_director() {
-    signal(1, signal_handler);
+void create_director() {
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork");
@@ -37,8 +43,4 @@ void wait_director() {
         perror("wait");
         exit(6);
     }
-}
-
-void signal_handler(int) {
-    close_clinic();
 }

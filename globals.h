@@ -17,6 +17,9 @@
 
 #define BUFFER 100
 
+#define REG_NUM 2
+#define MAX_QUEUE 10
+
 extern int protection;
 extern int visibility;
 

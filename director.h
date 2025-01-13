@@ -6,8 +6,9 @@
 #include <stdlib.h>
 
 #include "globals.h"
+#include "doctor.h"
 
-pid_t create_director();
+void create_director();
 void wait_director();
 void director_routine();
 void close_clinic();

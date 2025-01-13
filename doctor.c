@@ -1,9 +1,8 @@
 #include "doctor.h"
 
-void doctor_routine(int i, pid_t dir_pid) {
+void doctor_routine(int i) {
     do {
         // printf("doctor %d\n", i);
-        check_limits(dir_pid);
         examine_patient(i);
         sleep(3);
     } while(1);
@@ -57,7 +56,7 @@ void examine_patient(int dr_id) {
     sem_post(dr_pipe_lock[dr_id]);
 }
 
-void create_doctors(pid_t dir_pid) {
+void create_doctors() {
     pid_t pid;
     for (int i = 0; i < DR_NUM; i++) {
         pid = fork();
@@ -67,7 +66,7 @@ void create_doctors(pid_t dir_pid) {
         }
         if (pid == 0) {
             srand(time(0) + i);
-            doctor_routine(i, dir_pid);
+            doctor_routine(i);
         }
     }
 }
@@ -94,7 +93,7 @@ int get_rand_id() {
     return dr_id;
 }
 
-void check_limits(pid_t dir_pid) {
+int check_limits() {
     int full = 1;
     for (int i = 0; i < DR_NUM; i++) {
         if (dr_p_cnt[i] < dr_limits[i]) {
@@ -102,7 +101,5 @@ void check_limits(pid_t dir_pid) {
         }
     }
 
-    if (full) {
-        kill(dir_pid, 1);
-    }
+    return full;
 }

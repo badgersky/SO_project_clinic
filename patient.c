@@ -34,7 +34,7 @@ void patient_routine(int i) {
 
         leave_clinic();
     }
- 
+    exit(0);
 }
 
 int go_to_doc(int dr_id) {
