@@ -80,7 +80,6 @@ int patient_registration(int dr_id) {
     }
     printf("patient %d, registers response: %d\n", getpid(), reg_resp);
 
-    sleep(1);
     return reg_resp;
 }
 
@@ -90,6 +89,9 @@ void enter_clinic() {
     sem_wait(rq_lock);
     *rq_cnt += 1;
     sem_post(rq_lock);
+    sem_wait(p_cnt_lock);
+    *p_cnt += 1;
+    sem_post(p_cnt_lock);
 }
 
 void leave_queue() {
@@ -101,6 +103,9 @@ void leave_queue() {
 void leave_clinic() {
     printf("patient %d leaving clinic\n", getpid());
     sem_post(clinic_capacity);
+    sem_wait(p_cnt_lock);
+    *p_cnt -= 1;
+    sem_post(p_cnt_lock);
     exit(0);
 }
 
@@ -115,7 +120,6 @@ void create_patients() {
         if (pid == 0) {
             patient_routine(i);
         }
-        sleep(1);
     }
 }
 

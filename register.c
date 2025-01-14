@@ -68,7 +68,7 @@ void open_close_register(int* desks_open) {
         sem_wait(reg_queue);
         *desks_open -= 1;
     }
-    // printf("Number of patients in register queue: %d\n", *rq_cnt);
+    printf("Number of patients in register queue: %d\n", *rq_cnt);
     sem_post(rq_lock);
 }
 

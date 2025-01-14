@@ -18,7 +18,7 @@
 #define BUFFER 100
 
 #define REG_NUM 2
-#define MAX_QUEUE 10
+#define MAX_QUEUE 20
 
 extern int protection;
 extern int visibility;
@@ -27,8 +27,10 @@ extern int visibility;
 extern sem_t* reg_queue;
 extern sem_t* rq_lock;
 extern sem_t* clinic_capacity;
+extern sem_t* p_cnt_lock;
 
 extern int *rq_cnt;
+extern int *p_cnt;
 
 // clinic worktime variables
 extern int *t;

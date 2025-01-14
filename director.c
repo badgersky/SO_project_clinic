@@ -4,14 +4,19 @@ void director_routine() {
     int full;
     
     do {
-        // printf("director\n");
+        sem_wait(p_cnt_lock);
+        printf("director - number of patients inside: %d\n", *p_cnt);
+        sem_post(p_cnt_lock);
+
         full = check_limits();
         if (full == 1) {
+            printf("No free spots to any doctors\n");
             close_clinic();
         }
 
         *t += 1;
         if (*t >= TK) {
+            printf("End of clinics worktime\n");
             close_clinic();
         }
         sleep(3);

@@ -17,7 +17,7 @@ void examine_patient(int dr_id) {
 
     if (r < 2) {
         if (dr_id == 4 || dr_id == 5) {
-            spec_id = rand() % DR_NUM - 2;
+            spec_id = rand() % (DR_NUM - 2);
         }
     }
     
