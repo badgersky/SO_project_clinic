@@ -2,7 +2,6 @@
 
 void doctor_routine(int i) {
     do {
-        // printf("doctor %d\n", i);
         examine_patient(i);
         sleep(3);
     } while(1);
@@ -20,7 +19,7 @@ void examine_patient(int dr_id) {
             spec_id = rand() % (DR_NUM - 2);
         }
     }
-    
+
     close(patient_doctor[dr_id][1]);
     close(doctor_patient[dr_id][0]);
 
@@ -30,8 +29,8 @@ void examine_patient(int dr_id) {
         perror("read");
         exit(5);
     }
-
     printf("Doctor %d examining patient %d\n", dr_id, p_pid);
+
     if (spec_id >= 0 && spec_id <= 3) {
         sem_wait(drq_lock[dr_id]);
         if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
@@ -46,8 +45,8 @@ void examine_patient(int dr_id) {
             free(msg);
         }
         sem_post(drq_lock[dr_id]);
-    } 
-    
+    }
+
     if (write(doctor_patient[dr_id][1], &spec_id, sizeof(int)) < 0) {
         perror("write");
         exit(5);
@@ -55,6 +54,7 @@ void examine_patient(int dr_id) {
 
     sem_post(dr_pipe_lock[dr_id]);
 }
+
 
 void create_doctors() {
     pid_t pid;
@@ -96,9 +96,11 @@ int get_rand_id() {
 int check_limits() {
     int full = 1;
     for (int i = 0; i < DR_NUM; i++) {
+        sem_wait(drq_lock[i]);
         if (dr_p_cnt[i] < dr_limits[i]) {
             full = 0;
         }
+        sem_post(drq_lock[i]);
     }
 
     return full;

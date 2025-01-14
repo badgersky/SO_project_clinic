@@ -1,35 +1,35 @@
 #include "director.h"
 
 void director_routine() {
-    int full;
+    int full, done = 0;
     
     do {
-        sem_wait(p_cnt_lock);
-        printf("director - number of patients inside: %d\n", *p_cnt);
-        sem_post(p_cnt_lock);
-
         full = check_limits();
         if (full == 1) {
             printf("No free spots to any doctors\n");
             close_clinic();
+            done = 1;
         }
 
         *t += 1;
         if (*t >= TK) {
             printf("End of clinics worktime\n");
             close_clinic();
+            done = 1;
         }
-        sleep(3);
-    } while(1);
+        sleep(1);
+    } while(!done);
 
     exit(0);
 }
 
 void close_clinic() {
+    sem_wait(cs_lock);
     if (*clinic_state == 1) {
         printf("closing clinic\n");
         *clinic_state = 0;
     }
+    sem_post(cs_lock);
 }
 
 void create_director() {

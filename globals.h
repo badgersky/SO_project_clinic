@@ -10,7 +10,7 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 40
+#define MAX_P 100
 
 #define TP 0
 #define TK 100
@@ -18,7 +18,7 @@
 #define BUFFER 100
 
 #define REG_NUM 2
-#define MAX_QUEUE 20
+#define MAX_QUEUE 30
 
 extern int protection;
 extern int visibility;
@@ -33,6 +33,8 @@ extern int *rq_cnt;
 extern int *p_cnt;
 
 // clinic worktime variables
+extern sem_t* cs_lock;
+
 extern int *t;
 extern int *clinic_state;
 
