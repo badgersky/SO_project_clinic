@@ -1,10 +1,23 @@
 #include "doctor.h"
 
 void doctor_routine(int i) {
+    int done = 0;
+
     do {
         examine_patient(i);
+
+        sem_wait(cs_lock);
+        sem_wait(rq_lock);
+        sem_wait(p_cnt_lock);
+        if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
+            printf("Doctors leaving\n");
+            done = 1;
+        }
+        sem_post(p_cnt_lock);
+        sem_post(rq_lock);
+        sem_post(cs_lock);
         sleep(3);
-    } while(1);
+    } while(!done);
 
     exit(0);
 }

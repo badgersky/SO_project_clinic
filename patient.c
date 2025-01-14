@@ -6,7 +6,7 @@ void patient_routine(int i) {
     dr_id = get_rand_id();
 
     sem_wait(cs_lock);
-    if (*clinic_state > 0) {
+    if (*clinic_state == 1) {
         sem_post(cs_lock);
         enter_clinic();
 
@@ -38,6 +38,9 @@ void patient_routine(int i) {
         if (doc_resp2 == -1) {
             leave_clinic();
         }
+    } else {
+        sem_post(cs_lock);
+        exit(0);
     }
 }
 
