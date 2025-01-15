@@ -6,6 +6,7 @@ void doctor_routine(int i) {
     do {
         examine_patient(i);
 
+        printf("1doctor %d\n", i);
         sem_wait(cs_lock);
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
@@ -16,7 +17,8 @@ void doctor_routine(int i) {
         sem_post(p_cnt_lock);
         sem_post(rq_lock);
         sem_post(cs_lock);
-        sleep(3);
+        printf("2doctor %d\n", i);
+        sleep(1);
     } while(!done);
 
     exit(0);

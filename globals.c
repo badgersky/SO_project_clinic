@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock;
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity;
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -57,6 +57,11 @@ void initialize_sem() {
         perror("mmap");
         exit(2);
     }
+    rq_capacity = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+    if (rq_capacity == MAP_FAILED) {
+        perror("mmap");
+        exit(2);
+    }
 
     for (int i = 0; i < DR_NUM; i++) {
         drq_lock[i] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
@@ -81,13 +86,14 @@ void initialize_sem() {
         sem_init(dr_pipe_lock[i], 1, 1);
     }
 
-    sem_init(reg_queue, 1, 2);
-    sem_init(clinic_capacity, 1, 50);
+    sem_init(reg_queue, 1, 1);
+    sem_init(clinic_capacity, 1, MAX_CAPACITY);
     sem_init(rq_lock, 1, 1);
     sem_init(reg_pipe_lock, 1, 1);
     sem_init(report_lock, 1, 1);
     sem_init(p_cnt_lock, 1, 1);
     sem_init(cs_lock, 1, 1);
+    sem_init(rq_capacity, 1, MAX_QUEUE);
 }
 
 void destroy_sem() {
@@ -98,6 +104,7 @@ void destroy_sem() {
     sem_destroy(report_lock);
     sem_destroy(p_cnt_lock);
     sem_destroy(cs_lock);
+    sem_destroy(rq_capacity);
 
     for (int i = 0; i < DR_NUM; i++) {
         sem_destroy(drq_lock[i]);
@@ -142,6 +149,10 @@ void destroy_sem() {
         exit(2);
     } 
     if (munmap(cs_lock, sizeof(sem_t)) < 0) {
+        perror("munmap");
+        exit(2);
+    } 
+    if (munmap(rq_capacity, sizeof(sem_t)) < 0) {
         perror("munmap");
         exit(2);
     } 

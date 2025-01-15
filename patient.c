@@ -51,10 +51,13 @@ int go_to_doc(int dr_id) {
     close(patient_doctor[dr_id][0]);
     close(doctor_patient[dr_id][1]);
 
+    printf("patient %d writing to doctor %d\n", getpid(), dr_id);
     if (write(patient_doctor[dr_id][1], &pid, sizeof(pid_t)) < 0) {
         perror("write");
         exit(3);
     }
+
+    printf("patient %d reading from doctor %d\n", getpid(), dr_id);
     if (read(doctor_patient[dr_id][0], &doc_resp, sizeof(int)) < 0) {
         perror("read");
         exit(3);
@@ -73,15 +76,18 @@ int patient_registration(int dr_id) {
     close(patient_register[0]);
     close(register_patient[1]);
 
+    printf("patient %d writing pid to register\n", getpid());
     if (write(patient_register[1], &pid, sizeof(pid_t)) < 0) {
         perror("write");
         exit(3);
     }
+    printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
     if (write(patient_register[1], &dr_id, sizeof(int)) < 0) {
         perror("write");
         exit(3);
     }
-
+    
+    printf("patient %d reading register response\n", getpid());
     if (read(register_patient[0], &reg_resp, sizeof(int)) < 0) {
         perror("read");
         exit(3);
@@ -93,7 +99,7 @@ int patient_registration(int dr_id) {
 
 void enter_clinic() {
     sem_wait(clinic_capacity);
-
+    sem_wait(rq_capacity);
     sem_wait(rq_lock);
     *rq_cnt += 1;
     sem_post(rq_lock);
@@ -106,6 +112,7 @@ void leave_queue() {
     sem_wait(rq_lock);
     *rq_cnt -= 1;
     sem_post(rq_lock);
+    sem_post(rq_capacity);
 }
 
 void leave_clinic() {
