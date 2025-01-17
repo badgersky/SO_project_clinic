@@ -1,7 +1,12 @@
 #include "patient.h"
 
+void p_sigusr2_handler(int sig) {
+    printf("patient %d received signal %d\n", getpid(), sig);
+}
+
 void patient_routine(int i) {
     srand(getpid());
+    signal(SIGUSR2, p_sigusr2_handler);
     sem_wait(pids->pid_lock);
     pids->pids[pids->count] = getpid();
     pids->count += 1; 

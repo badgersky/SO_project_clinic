@@ -1,6 +1,17 @@
 #include "director.h"
 
+void d_sigusr2_handler(int sig) {
+    printf("Doctor %d received SIGUSR2, forwarding to all patients...\n", getpid());
+
+    sem_wait(pids->pid_lock);
+    for (int i = 0; i < pids->count; i++) {
+        kill(pids->pids[i], SIGUSR2);
+    }
+    sem_post(pids->pid_lock);
+}
+
 void director_routine() {
+    signal(SIGUSR2, d_sigusr2_handler);
     int full, done = 0;
     
     do {

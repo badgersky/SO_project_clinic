@@ -13,3 +13,4 @@ void wait_director();
 void director_routine();
 void close_clinic();
 void signal_handler();
+void d_sigusr2_handler();

@@ -4,6 +4,7 @@
 #include <sys/mman.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "globals.h"
 #include "doctor.h"
@@ -16,3 +17,4 @@ void enter_clinic();
 void leave_queue();
 int patient_registration(int dr_id);
 int go_to_doc(int dr_id);
+void p_sigusr2_handler();
