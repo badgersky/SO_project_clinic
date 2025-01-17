@@ -15,7 +15,7 @@ void doctor_routine(int i) {
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
         if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
-            printf("Doctors leaving\n");
+            printf("Doctors %d leaving\n", i);
             done = 1;
         }
         sem_post(p_cnt_lock);
@@ -43,7 +43,7 @@ void examine_patient(int dr_id) {
 
     sem_wait(dr_pipe_lock[dr_id]);
 
-    printf("Doctor %d before reading from patient\n", dr_id);
+    // printf("Doctor %d before reading from patient\n", dr_id);
 
     if (read(patient_doctor[dr_id][0], &p_pid, sizeof(pid_t)) < 0) {
         perror("read");

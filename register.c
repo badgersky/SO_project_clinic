@@ -23,7 +23,6 @@ void register_routine() {
             sem_post(rq_lock);
         }
 
-        printf("1register\n");
         sem_wait(cs_lock);
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
@@ -36,7 +35,6 @@ void register_routine() {
         sem_post(p_cnt_lock);
         sem_post(rq_lock);
         sem_post(cs_lock);
-        printf("2register\n");
         sleep(1);
     } while(!done);
 
@@ -50,20 +48,20 @@ void process_patient() {
     close(register_patient[0]);
     close(patient_register[1]);
 
-    printf("before reg_pipe_lock\n");
+    // printf("before reg_pipe_lock\n");
     sem_wait(reg_pipe_lock);
-    printf("register reading p pid\n");
+    // printf("register reading p pid\n");
     if (read(patient_register[0], &p_pid, sizeof(int)) < 0) {
         perror("read");
         exit(3);
     }
-    printf("register got p pid %d\n", p_pid);
-    printf("register reading dr id\n");
+    // printf("register got p pid %d\n", p_pid);
+    // printf("register reading dr id\n");
     if (read(patient_register[0], &dr_id, sizeof(int)) < 0) {
         perror("read");
         exit(3);
     }
-    printf("register got dr id\n");
+    // printf("register got dr id\n");
     sem_wait(cs_lock);
     if (*clinic_state == 0) {
         sem_post(cs_lock);
@@ -85,12 +83,12 @@ void process_patient() {
         }
         sem_post(drq_lock[dr_id]);
     }
-    printf("register writing to patient %d\n", p_pid);
+    // printf("register writing to patient %d\n", p_pid);
     if (write(register_patient[1], &reg_resp, sizeof(int)) < 0) {
         perror("write");
         exit(3);
     }
-    printf("register finished writing to patient %d\n", p_pid);
+    // printf("register finished writing to patient %d\n", p_pid);
     sem_post(reg_pipe_lock);
 }
 

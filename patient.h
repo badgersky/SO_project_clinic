@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <pthread.h>
 
 #include "globals.h"
 #include "doctor.h"
@@ -18,3 +19,4 @@ void leave_queue();
 int patient_registration(int dr_id);
 int go_to_doc(int dr_id);
 void p_sigusr2_handler();
+int is_minor();

@@ -10,15 +10,15 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 100
+#define MAX_P 200
 
 #define TP 0
-#define TK 100
+#define TK 150
 
 #define BUFFER 100
 
 #define REG_NUM 2
-#define MAX_QUEUE 20
+#define MAX_QUEUE 30
 #define MAX_CAPACITY 50
 
 extern int protection;

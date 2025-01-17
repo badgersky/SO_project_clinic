@@ -1,5 +1,20 @@
 #include "patient.h"
 
+void* child_routine(void* arg) {
+    printf("child patient, parent's id: %d\n", getpid());
+    pthread_exit(0);
+}
+
+int is_minor() {
+    int r = rand() % 10;
+
+    if (r < 2) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 void p_sigusr2_handler(int sig) {
     printf("patient %d received signal %d\n", getpid(), sig);
     leave_queue();
@@ -7,13 +22,23 @@ void p_sigusr2_handler(int sig) {
 }
 
 void patient_routine(int i) {
-    srand(getpid());
+    pthread_t ch_id;
     signal(SIGUSR2, p_sigusr2_handler);
     sem_wait(pids->pid_lock);
     pids->pids[pids->count] = getpid();
     pids->count += 1; 
-    printf("updated pids\n");
+    // printf("updated pids\n");
     sem_post(pids->pid_lock);
+
+    int m = is_minor();
+
+    if (m) {
+        if (pthread_create(&ch_id, NULL, &child_routine, NULL) != 0) {
+            perror("pthread_create");
+            exit(3);
+        }
+        pthread_detach(ch_id);
+    }
 
     int reg_resp = 0, dr_id, doc_resp1 = -1, doc_resp2 = -1;
     dr_id = get_rand_id();
@@ -67,18 +92,18 @@ int go_to_doc(int dr_id) {
     close(patient_doctor[dr_id][0]);
     close(doctor_patient[dr_id][1]);
 
-    printf("patient %d writing to doctor %d\n", getpid(), dr_id);
+    // printf("patient %d writing to doctor %d\n", getpid(), dr_id);
     if (write(patient_doctor[dr_id][1], &pid, sizeof(pid_t)) < 0) {
         perror("write");
         exit(3);
     }
 
-    printf("patient %d reading from doctor %d\n", getpid(), dr_id);
+    // printf("patient %d reading from doctor %d\n", getpid(), dr_id);
     if (read(doctor_patient[dr_id][0], &doc_resp, sizeof(int)) < 0) {
         perror("read");
         exit(3);
     }
-    printf("Patient %d received response %d from doctor %d\n", pid, doc_resp, dr_id);
+    // printf("Patient %d received response %d from doctor %d\n", pid, doc_resp, dr_id);
 
     sem_wait(drq_cnt_lock[dr_id]);
     drq_cnt[dr_id] -= 1;
@@ -88,25 +113,25 @@ int go_to_doc(int dr_id) {
 
 
 int patient_registration(int dr_id) {
-    printf("patient %d registering\n", getpid());
+    printf("patient %d registering to doctor %d\n", getpid(), dr_id);
     int reg_resp;
     pid_t pid = getpid();
 
     close(patient_register[0]);
     close(register_patient[1]);
 
-    printf("patient %d writing pid to register\n", getpid());
+    // printf("patient %d writing pid to register\n", getpid());
     if (write(patient_register[1], &pid, sizeof(pid_t)) < 0) {
         perror("write");
         exit(3);
     }
-    printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
+    // printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
     if (write(patient_register[1], &dr_id, sizeof(int)) < 0) {
         perror("write");
         exit(3);
     }
     
-    printf("patient %d reading register response\n", getpid());
+    // printf("patient %d reading register response\n", getpid());
     if (read(register_patient[0], &reg_resp, sizeof(int)) < 0) {
         perror("read");
         exit(3);
@@ -152,6 +177,7 @@ void create_patients() {
             exit(3);
         }
         if (pid == 0) {
+            srand(getpid());
             sem_wait(emergency_lock);
             if (!*emergency) {
                 sem_post(emergency_lock);
