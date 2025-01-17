@@ -3,6 +3,10 @@
 void d_sigusr2_handler(int sig) {
     printf("Doctor %d received SIGUSR2, forwarding to all patients...\n", getpid());
 
+    sem_wait(emergency_lock);
+    *emergency = 1;
+    sem_post(emergency_lock);
+
     sem_wait(pids->pid_lock);
     for (int i = 0; i < pids->count; i++) {
         kill(pids->pids[i], SIGUSR2);

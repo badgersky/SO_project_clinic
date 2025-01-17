@@ -2,6 +2,8 @@
 
 void p_sigusr2_handler(int sig) {
     printf("patient %d received signal %d\n", getpid(), sig);
+    leave_queue();
+    leave_clinic();
 }
 
 void patient_routine(int i) {
@@ -121,7 +123,7 @@ void enter_clinic() {
 
 void leave_queue() {
     sem_wait(rq_lock);
-    *rq_cnt -= 1;
+    if (*rq_cnt > 0) *rq_cnt -= 1;
     sem_post(rq_lock);
     sem_post(rq_capacity);
 }
@@ -129,7 +131,7 @@ void leave_queue() {
 void leave_clinic() {
     printf("patient %d leaving clinic\n", getpid());
     sem_wait(p_cnt_lock);
-    *p_cnt -= 1;
+    if (*p_cnt > 0) *p_cnt -= 1;
     sem_post(p_cnt_lock);
     sem_post(clinic_capacity);
     exit(0);
@@ -144,7 +146,14 @@ void create_patients() {
             exit(3);
         }
         if (pid == 0) {
-            patient_routine(i);
+            sem_wait(emergency_lock);
+            if (!*emergency) {
+                sem_post(emergency_lock);
+                patient_routine(i);
+            } else {
+                sem_post(emergency_lock);
+            }
+            
         }
     }
 }
