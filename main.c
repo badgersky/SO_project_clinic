@@ -15,6 +15,7 @@ int main() {
     initialize_sem();
     share_variables();
     init_variables();
+    initialize_pids();
 
     create_director();
     create_registers();
@@ -26,6 +27,7 @@ int main() {
     wait_registers();
     wait_director();
 
+    cleanup_pids();
     free_variables();
     destroy_sem();
     return 0;

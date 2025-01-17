@@ -22,8 +22,8 @@ void register_routine() {
         } else {
             sem_post(rq_lock);
         }
-        
 
+        printf("1register\n");
         sem_wait(cs_lock);
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
@@ -36,6 +36,7 @@ void register_routine() {
         sem_post(p_cnt_lock);
         sem_post(rq_lock);
         sem_post(cs_lock);
+        printf("2register\n");
         sleep(1);
     } while(!done);
 

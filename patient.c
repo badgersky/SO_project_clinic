@@ -2,6 +2,12 @@
 
 void patient_routine(int i) {
     srand(getpid());
+    sem_wait(pids->pid_lock);
+    pids->pids[pids->count] = getpid();
+    pids->count += 1; 
+    printf("updated pids\n");
+    sem_post(pids->pid_lock);
+
     int reg_resp = 0, dr_id, doc_resp1 = -1, doc_resp2 = -1;
     dr_id = get_rand_id();
 

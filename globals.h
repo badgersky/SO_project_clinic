@@ -18,7 +18,7 @@
 #define BUFFER 100
 
 #define REG_NUM 2
-#define MAX_QUEUE 30
+#define MAX_QUEUE 20
 #define MAX_CAPACITY 50
 
 extern int protection;
@@ -63,6 +63,19 @@ extern sem_t* dr_pipe_lock[6];
 extern FILE *report;
 extern sem_t* report_lock;
 
+// patients pids
+typedef struct {
+    pid_t pids[MAX_P];
+    int count;
+    sem_t* pid_lock;
+} pid_tracker;
+
+extern pid_tracker* pids;
+
+// emergency
+extern int* emergency;
+extern sem_t* emergency_lock;
+
 #endif
 
 void initialize_sem();
@@ -73,3 +86,5 @@ void init_variables();
 void open_report();
 void close_report();
 void write_report(char* msg);
+void initialize_pids();
+void cleanup_pids();

@@ -4,6 +4,7 @@ void director_routine() {
     int full, done = 0;
     
     do {
+        printf("Director %d\n", getpid());
         full = check_limits();
         if (full == 1) {
             printf("No free spots to any doctors\n");
