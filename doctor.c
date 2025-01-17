@@ -4,9 +4,13 @@ void doctor_routine(int i) {
     int done = 0;
 
     do {
-        examine_patient(i);
+        sem_wait(drq_cnt_lock[i]);
+        if (drq_cnt[i] > 0) {
+            sem_post(drq_cnt_lock[i]);
+            examine_patient(i);
+        }
+        sem_post(drq_cnt_lock[i]);
 
-        printf("1doctor %d\n", i);
         sem_wait(cs_lock);
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
@@ -17,7 +21,6 @@ void doctor_routine(int i) {
         sem_post(p_cnt_lock);
         sem_post(rq_lock);
         sem_post(cs_lock);
-        printf("2doctor %d\n", i);
         sleep(1);
     } while(!done);
 
@@ -39,6 +42,8 @@ void examine_patient(int dr_id) {
     close(doctor_patient[dr_id][0]);
 
     sem_wait(dr_pipe_lock[dr_id]);
+
+    printf("Doctor %d before reading from patient\n", dr_id);
 
     if (read(patient_doctor[dr_id][0], &p_pid, sizeof(pid_t)) < 0) {
         perror("read");

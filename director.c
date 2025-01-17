@@ -1,10 +1,13 @@
 #include "director.h"
 
+int done = 0;
+
 void d_sigusr2_handler(int sig) {
     printf("Doctor %d received SIGUSR2, forwarding to all patients...\n", getpid());
 
     sem_wait(emergency_lock);
     *emergency = 1;
+    close_clinic();
     sem_post(emergency_lock);
 
     sem_wait(pids->pid_lock);
@@ -12,11 +15,13 @@ void d_sigusr2_handler(int sig) {
         kill(pids->pids[i], SIGUSR2);
     }
     sem_post(pids->pid_lock);
+
+    done = 1;
 }
 
 void director_routine() {
     signal(SIGUSR2, d_sigusr2_handler);
-    int full, done = 0;
+    int full;
     
     do {
         printf("Director %d\n", getpid());

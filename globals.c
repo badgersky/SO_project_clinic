@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock;
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6];
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -15,6 +15,7 @@ int register_patient[2];
 
 int* dr_limits;
 int* dr_p_cnt;
+int* drq_cnt;
 
 int patient_doctor[6][2];
 int doctor_patient[6][2];
@@ -122,6 +123,13 @@ void initialize_sem() {
             exit(2);
         }
         sem_init(dr_pipe_lock[i], 1, 1);
+
+        drq_cnt_lock[i] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+        if (drq_cnt_lock[i] == MAP_FAILED) {
+            perror("mmap");
+            exit(2);
+        }
+        sem_init(drq_cnt_lock[i], 1, 1);
     }
 
     sem_init(reg_queue, 1, 1);
@@ -159,6 +167,10 @@ void destroy_sem() {
             exit(2);
         } 
         if (munmap(dr_pipe_lock[i], sizeof(sem_t)) < 0) {
+            perror("munmap");
+            exit(2);
+        } 
+        if (munmap(drq_cnt_lock[i], sizeof(sem_t)) < 0) {
             perror("munmap");
             exit(2);
         } 
@@ -234,8 +246,13 @@ void share_variables() {
         perror("mmap");
         exit(4);
     }
-    emergency = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
+    emergency = mmap(NULL, sizeof(int), protection, visibility, -1, 0);
     if (emergency == MAP_FAILED) {
+        perror("mmap");
+        exit(4);
+    }
+    drq_cnt = mmap(NULL, sizeof(int), protection, visibility, -1, 0);
+    if (drq_cnt == MAP_FAILED) {
         perror("mmap");
         exit(4);
     }
@@ -290,6 +307,8 @@ void init_variables() {
             perror("pipe");
             exit(4);
         }
+
+        drq_cnt[i] = 0;
     }
 
     if (pipe(patient_register) < 0) {

@@ -58,6 +58,9 @@ void patient_routine(int i) {
 }
 
 int go_to_doc(int dr_id) {
+    sem_wait(drq_cnt_lock[dr_id]);
+    drq_cnt[dr_id] += 1;
+    sem_post(drq_cnt_lock[dr_id]);
     int doc_resp;
     pid_t pid = getpid();
 
@@ -77,6 +80,9 @@ int go_to_doc(int dr_id) {
     }
     printf("Patient %d received response %d from doctor %d\n", pid, doc_resp, dr_id);
 
+    sem_wait(drq_cnt_lock[dr_id]);
+    drq_cnt[dr_id] -= 1;
+    sem_post(drq_cnt_lock[dr_id]);
     return doc_resp;
 }
 
