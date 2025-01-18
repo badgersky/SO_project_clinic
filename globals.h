@@ -74,6 +74,11 @@ typedef struct {
 
 extern pid_tracker* pids;
 
+// doctors queues pid tracker
+pid_t* pdrq_pids[6];
+
+sem_t* pdrq_pids_lock;
+
 // emergency
 extern int* emergency;
 extern sem_t* emergency_lock;
@@ -90,3 +95,5 @@ void close_report();
 void write_report(char* msg);
 void initialize_pids();
 void cleanup_pids();
+void insert_pid(int dr_id, pid_t pid);
+void remove_pid(int dr_id, pid_t pid);

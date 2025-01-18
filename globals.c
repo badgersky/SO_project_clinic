@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6];
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock;;
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -21,6 +21,8 @@ int patient_doctor[6][2];
 int doctor_patient[6][2];
 
 int* emergency;
+
+int* pdrq_pids[6];
 
 pid_tracker* pids;
 
@@ -256,6 +258,14 @@ void share_variables() {
         perror("mmap");
         exit(4);
     }
+
+    for (int i = 0; i < DR_NUM; i++) {
+        pdrq_pids[i] = mmap(NULL, sizeof(pid_t) * MAX_P, protection, visibility, -1, 0);
+        if (pdrq_pids[i] == MAP_FAILED) {
+            perror("mmap");
+            exit(4);
+        }
+    }
 }
 
 void open_report() {
@@ -309,6 +319,10 @@ void init_variables() {
         }
 
         drq_cnt[i] = 0;
+
+        for (int j = 0; j < MAX_P; j++) {
+            pdrq_pids[i][j] = -1;
+        }
     }
 
     if (pipe(patient_register) < 0) {
@@ -356,10 +370,33 @@ void free_variables() {
         close(patient_doctor[i][1]);
         close(doctor_patient[i][0]);
         close(doctor_patient[i][1]);
+
+        if (munmap(pdrq_pids[i], sizeof(pid_t) * MAX_P) < 0) {
+            perror("munmap");
+            exit(4);
+        }
     }
 
     close(patient_register[1]);
     close(register_patient[1]);
     close(patient_register[0]);
     close(register_patient[0]);
+}
+
+void insert_pid(int dr_id, pid_t pid) {
+    for (int i = 0; i < MAX_P; i++) {
+        if (pdrq_pids[dr_id][i] != -1) {
+            pdrq_pids[dr_id][i] = pid;
+            break;
+        }
+    }
+}
+
+void remove_pid(int dr_id, pid_t pid) {
+    for (int i = 0; i < MAX_P; i++) {
+        if (pdrq_pids[dr_id][i] == pid) {
+            pdrq_pids[dr_id][i] = -1;
+            break;
+        }
+    }
 }

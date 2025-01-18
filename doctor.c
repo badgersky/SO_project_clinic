@@ -21,6 +21,9 @@ void doctor_routine(int i) {
         sem_post(drq_cnt_lock[i]);
 
         if (stop_treating) {
+            sem_wait(drq_lock[i]);
+            dr_p_cnt[i] = dr_limits[i];
+            sem_post(drq_lock[i]);
             done = 1;
         }
 
