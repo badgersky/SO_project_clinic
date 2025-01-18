@@ -70,7 +70,7 @@ void examine_patient(int dr_id) {
 
     sem_wait(dr_pipe_lock[dr_id]);
 
-    // printf("Doctor %d before reading from patient\n", dr_id);
+    printf("Doctor %d before reading from patient\n", dr_id);
 
     if (read(patient_doctor[dr_id][0], &p_pid, sizeof(pid_t)) < 0) {
         perror("read doctor");

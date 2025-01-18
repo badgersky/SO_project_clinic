@@ -34,8 +34,6 @@ void register_routine() {
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
         if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
-            printf("Number of patients inside: %d\n", *p_cnt);
-            printf("Number of patients in register queue: %d\n", *rq_cnt);
             printf("Closing registers\n");
             done = 1;
         }
@@ -55,20 +53,20 @@ void process_patient() {
     close(register_patient[0]);
     close(patient_register[1]);
 
-    // printf("before reg_pipe_lock\n");
+    printf("before reg_pipe_lock\n");
     sem_wait(reg_pipe_lock);
-    // printf("register reading p pid\n");
+    printf("register reading p pid\n");
     if (read(patient_register[0], &p_pid, sizeof(int)) < 0) {
         perror("read reg");
         exit(3);
     }
-    // printf("register got p pid %d\n", p_pid);
-    // printf("register reading dr id\n");
+    printf("register got p pid %d\n", p_pid);
+    printf("register reading dr id\n");
     if (read(patient_register[0], &dr_id, sizeof(int)) < 0) {
         perror("read reg");
         exit(3);
     }
-    // printf("register got dr id\n");
+    printf("register got dr id\n");
     sem_wait(cs_lock);
     if (*clinic_state == 0) {
         sem_post(cs_lock);
@@ -90,12 +88,12 @@ void process_patient() {
         }
         sem_post(drq_lock[dr_id]);
     }
-    // printf("register writing to patient %d\n", p_pid);
+    printf("register writing to patient %d\n", p_pid);
     if (write(register_patient[1], &reg_resp, sizeof(int)) < 0) {
         perror("write reg");
         exit(3);
     }
-    // printf("register finished writing to patient %d\n", p_pid);
+    printf("register finished writing to patient %d\n", p_pid);
     sem_post(reg_pipe_lock);
 }
 
@@ -107,7 +105,9 @@ void open_close_register(int* desks_open) {
         *desks_open += 1;
     }
     if (*desks_open == 2 && *rq_cnt < MAX_QUEUE / 3) {
-        if (sem_trywait(reg_queue) == 0) {
+        int sem_val;
+        sem_getvalue(reg_queue, &sem_val);
+        if (sem_trywait(reg_queue) == 0 && sem_val == 2) {
             printf("second register closed\n");
             *desks_open -= 1;
         }
@@ -126,7 +126,6 @@ void create_registers() {
     if (pid == 0) {
         register_routine();
     }
-
     sleep(1);
 }
 

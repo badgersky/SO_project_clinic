@@ -92,18 +92,18 @@ int go_to_doc(int dr_id) {
     close(patient_doctor[dr_id][0]);
     close(doctor_patient[dr_id][1]);
 
-    // printf("patient %d writing to doctor %d\n", getpid(), dr_id);
+    printf("patient %d writing to doctor %d\n", getpid(), dr_id);
     if (write(patient_doctor[dr_id][1], &pid, sizeof(pid_t)) < 0) {
         perror("write patient doc");
         exit(3);
     }
 
-    // printf("patient %d reading from doctor %d\n", getpid(), dr_id);
+    printf("patient %d reading from doctor %d\n", getpid(), dr_id);
     if (read(doctor_patient[dr_id][0], &doc_resp, sizeof(int)) < 0) {
         perror("read patient doc");
         exit(3);
     }
-    // printf("Patient %d received response %d from doctor %d\n", pid, doc_resp, dr_id);
+    printf("Patient %d received response %d from doctor %d\n", pid, doc_resp, dr_id);
 
     sem_wait(drq_cnt_lock[dr_id]);
     drq_cnt[dr_id] -= 1;
@@ -125,26 +125,23 @@ int patient_registration(int dr_id) {
     close(patient_register[0]);
     close(register_patient[1]);
 
-    // printf("patient %d writing pid to register\n", getpid());
+    printf("patient %d writing pid to register\n", getpid());
     if (write(patient_register[1], &pid, sizeof(pid_t)) < 0) {
         perror("write patient reg");
         exit(3);
     }
-    // printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
+    printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
     if (write(patient_register[1], &dr_id, sizeof(int)) < 0) {
         perror("write patient reg");
         exit(3);
     }
     
-    // printf("patient %d reading register response\n", getpid());
+    printf("patient %d reading register response\n", getpid());
     if (read(register_patient[0], &reg_resp, sizeof(int)) < 0) {
         perror("read patient reg");
         exit(3);
     }
     printf("patient %d, registers response: %d\n", getpid(), reg_resp);
-
-    close(patient_register[1]);
-    close(register_patient[0]);
     return reg_resp;
 }
 
