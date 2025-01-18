@@ -86,6 +86,19 @@ void create_doctors() {
         }
         if (pid == 0) {
             srand(time(0) + i);
+            for (int j = 0; j < DR_NUM; j++) {
+                if (i != j) {
+                    close(patient_doctor[j][0]);
+                    close(patient_doctor[j][1]);
+                    close(doctor_patient[j][0]);
+                    close(doctor_patient[j][1]);
+                } 
+            }
+
+            close(patient_register[1]);
+            close(register_patient[1]);
+            close(patient_register[0]);
+            close(register_patient[0]);
             doctor_routine(i);
         }
     }

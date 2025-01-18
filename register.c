@@ -5,6 +5,13 @@ void register_routine() {
     *desks_open = 1;
     int done = 0;
 
+    for (int i = 0; i < DR_NUM; i++) {
+        close(patient_doctor[i][0]);
+        close(patient_doctor[i][1]);
+        close(doctor_patient[i][0]);
+        close(doctor_patient[i][1]);
+    }
+
     do {
         sem_wait(p_cnt_lock);
         printf("Number of patients inside: %d\n", *p_cnt);

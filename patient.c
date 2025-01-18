@@ -43,6 +43,15 @@ void patient_routine(int i) {
     int reg_resp = 0, dr_id, doc_resp1 = -1, doc_resp2 = -1;
     dr_id = get_rand_id();
 
+    for (int j = 0; j < DR_NUM; j++) {
+        if (j != dr_id) {
+            close(patient_doctor[j][0]);
+            close(patient_doctor[j][1]);
+            close(doctor_patient[j][0]);
+            close(doctor_patient[j][1]);
+        }
+    }
+
     sem_wait(cs_lock);
     if (*clinic_state == 1) {
         sem_post(cs_lock);
@@ -108,6 +117,11 @@ int go_to_doc(int dr_id) {
     sem_wait(drq_cnt_lock[dr_id]);
     drq_cnt[dr_id] -= 1;
     sem_post(drq_cnt_lock[dr_id]);
+    
+    if (doc_resp < 0) {
+        close(patient_doctor[dr_id][1]);
+        close(doctor_patient[dr_id][0]);
+    }
     return doc_resp;
 }
 
@@ -138,6 +152,8 @@ int patient_registration(int dr_id) {
     }
     printf("patient %d, registers response: %d\n", getpid(), reg_resp);
 
+    close(patient_register[1]);
+    close(register_patient[0]);
     return reg_resp;
 }
 

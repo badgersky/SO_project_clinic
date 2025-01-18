@@ -22,7 +22,17 @@ void d_sigusr2_handler(int sig) {
 void director_routine() {
     signal(SIGUSR2, d_sigusr2_handler);
     int full;
-    
+    for (int i = 0; i < DR_NUM; i++) {
+        close(patient_doctor[i][0]);
+        close(patient_doctor[i][1]);
+        close(doctor_patient[i][0]);
+        close(doctor_patient[i][1]);
+    }
+
+    close(patient_register[1]);
+    close(register_patient[1]);
+    close(patient_register[0]);
+    close(register_patient[0]);
     do {
         printf("Director %d\n", getpid());
         full = check_limits();
