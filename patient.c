@@ -186,7 +186,6 @@ void create_patients() {
             } else {
                 sem_post(emergency_lock);
             }
-            
         }
         sleep(1);
     }

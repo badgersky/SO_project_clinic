@@ -21,6 +21,12 @@
 #define MAX_QUEUE 20
 #define MAX_CAPACITY 50
 
+#define X1 20;
+#define X2 10;
+#define X3 10;
+#define X4 10;
+#define X5 10;
+
 extern int protection;
 extern int visibility;
 

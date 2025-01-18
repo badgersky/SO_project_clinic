@@ -23,6 +23,7 @@ int doctor_patient[6][2];
 int* emergency;
 
 pid_tracker* pids;
+pdrq_tracker* pdrq_pids[6];
 
 FILE* report;
 
@@ -53,6 +54,38 @@ void cleanup_pids() {
         perror("munmap");
         exit(1);
     };
+}
+
+void initialize_pdrq_pids() {
+    for (int i = 0; i < DR_NUM; i++) {
+        pdrq_pids[i] = (pdrq_tracker*)mmap(NULL, sizeof(pdrq_tracker) * dr_limits[i], protection, visibility, -1, 0);
+        if (pdrq_pids == MAP_FAILED) {
+            perror("mmap");
+            exit(1);
+        }
+
+        pdrq_pids[i]->pid_lock = (sem_t*)mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+        if (pdrq_pids[i]->pid_lock == MAP_FAILED) {
+            perror("mmap");
+            exit(1);
+        }
+
+        sem_init(pdrq_pids[i]->pid_lock, 1, 1);
+    }
+}
+
+void cleanup_pdrq_pids() {
+    for (int i = 0; i < DR_NUM; i++) {
+        sem_destroy(pdrq_pids[i]->pid_lock);
+        if (munmap(pdrq_pids[i]->pid_lock, sizeof(sem_t)) < 0) {
+            perror("munmap");
+            exit(1);
+        }
+        if (munmap(pdrq_pids[i], sizeof(pdrq_tracker)) < 0) {
+            perror("munmap");
+            exit(1);
+        };
+    }
 }
 
 void initialize_sem() {
@@ -289,12 +322,12 @@ void init_variables() {
     *p_cnt = 0;
     *emergency = 0;
 
-    dr_limits[0] = 10;
-    dr_limits[1] = 10;
-    dr_limits[2] = 10;
-    dr_limits[3] = 10;
-    dr_limits[4] = 20;
-    dr_limits[5] = 20;
+    dr_limits[0] = X5;
+    dr_limits[1] = X4;
+    dr_limits[2] = X3;
+    dr_limits[3] = X2;
+    dr_limits[4] = X1;
+    dr_limits[5] = X1;
 
     for (int i = 0; i < DR_NUM; i++) {
         dr_p_cnt[i] = 0;
