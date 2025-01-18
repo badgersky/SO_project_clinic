@@ -77,6 +77,7 @@ void patient_routine(int i) {
             leave_clinic();
         }
     } else {
+        printf("Clinic is closed, patient %d is going home.\n", getpid());
         sem_post(cs_lock);
         exit(0);
     }
@@ -187,6 +188,7 @@ void create_patients() {
             }
             
         }
+        sleep(1);
     }
 }
 

@@ -71,7 +71,7 @@ void examine_patient(int dr_id) {
         perror("write");
         exit(5);
     }
-
+    sleep(1);
     sem_post(dr_pipe_lock[dr_id]);
 }
 

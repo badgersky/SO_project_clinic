@@ -27,8 +27,6 @@ void register_routine() {
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
         if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
-            printf("Number of patients inside: %d\n", *p_cnt);
-            printf("Number of patients in register queue: %d\n", *rq_cnt);
             printf("Closing registers\n");
             done = 1;
         }
@@ -89,6 +87,7 @@ void process_patient() {
         exit(3);
     }
     // printf("register finished writing to patient %d\n", p_pid);
+    sleep(1);
     sem_post(reg_pipe_lock);
 }
 

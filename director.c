@@ -12,7 +12,9 @@ void d_sigusr2_handler(int sig) {
 
     sem_wait(pids->pid_lock);
     for (int i = 0; i < pids->count; i++) {
-        kill(pids->pids[i], SIGUSR2);
+        if (pids->pids[i] > 0) {
+            kill(pids->pids[i], SIGUSR2);
+        }
     }
     sem_post(pids->pid_lock);
 
@@ -39,7 +41,7 @@ void director_routine() {
             done = 1;
         }
         sleep(1);
-    } while(!done);
+    } while(1);
 
     exit(0);
 }

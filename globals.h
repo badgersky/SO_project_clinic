@@ -10,15 +10,15 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 200
+#define MAX_P 100
 
 #define TP 0
-#define TK 150
+#define TK 100
 
 #define BUFFER 100
 
 #define REG_NUM 2
-#define MAX_QUEUE 30
+#define MAX_QUEUE 20
 #define MAX_CAPACITY 50
 
 extern int protection;
@@ -73,6 +73,15 @@ typedef struct {
 } pid_tracker;
 
 extern pid_tracker* pids;
+
+// patient - doctor queues
+typedef struct {
+    pid_t* pids;
+    sem_t* pid_lock;
+    int count;
+} pdrq_tracker;
+
+extern pdrq_tracker* pdrq_pids[6];
 
 // emergency
 extern int* emergency;
