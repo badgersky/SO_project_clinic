@@ -10,16 +10,16 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 200
+#define MAX_P 40
 
 #define TP 0
-#define TK 150
+#define TK 30
 
 #define BUFFER 100
 
 #define REG_NUM 2
-#define MAX_QUEUE 30
-#define MAX_CAPACITY 50
+#define MAX_QUEUE 15
+#define MAX_CAPACITY 30
 
 extern int protection;
 extern int visibility;
@@ -76,8 +76,6 @@ extern pid_tracker* pids;
 
 // doctors queues pid tracker
 pid_t* pdrq_pids[6];
-
-sem_t* pdrq_pids_lock;
 
 // emergency
 extern int* emergency;

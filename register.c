@@ -59,13 +59,13 @@ void process_patient() {
     sem_wait(reg_pipe_lock);
     // printf("register reading p pid\n");
     if (read(patient_register[0], &p_pid, sizeof(int)) < 0) {
-        perror("read");
+        perror("read reg");
         exit(3);
     }
     // printf("register got p pid %d\n", p_pid);
     // printf("register reading dr id\n");
     if (read(patient_register[0], &dr_id, sizeof(int)) < 0) {
-        perror("read");
+        perror("read reg");
         exit(3);
     }
     // printf("register got dr id\n");
@@ -92,7 +92,7 @@ void process_patient() {
     }
     // printf("register writing to patient %d\n", p_pid);
     if (write(register_patient[1], &reg_resp, sizeof(int)) < 0) {
-        perror("write");
+        perror("write reg");
         exit(3);
     }
     // printf("register finished writing to patient %d\n", p_pid);

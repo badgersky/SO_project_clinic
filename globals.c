@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock;;
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6];
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
