@@ -1,15 +1,28 @@
 #include "doctor.h"
 
+int stop_treating = 0;
+
+void sigusr1_handler(int sig) {
+    stop_treating = 1;
+}
+
 void doctor_routine(int i) {
     int done = 0;
 
+    signal(SIGUSR1, sigusr1_handler);
+
     do {
+        printf("Doctor %d\n", getpid());
         sem_wait(drq_cnt_lock[i]);
         if (drq_cnt[i] > 0) {
             sem_post(drq_cnt_lock[i]);
             examine_patient(i);
         }
         sem_post(drq_cnt_lock[i]);
+
+        if (stop_treating) {
+            done = 1;
+        }
 
         sem_wait(cs_lock);
         sem_wait(rq_lock);
