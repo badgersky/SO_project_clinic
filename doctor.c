@@ -8,8 +8,20 @@ void sigusr1_handler(int sig) {
 
 void doctor_routine(int i) {
     int done = 0;
-
     signal(SIGUSR1, sigusr1_handler);
+    for (int j = 0; j < DR_NUM; j++) {
+        if (j != i) {
+            close(patient_doctor[j][0]);
+            close(patient_doctor[j][1]);
+            close(doctor_patient[j][0]);
+            close(doctor_patient[j][1]);
+        }
+    }
+
+    close(patient_register[1]);
+    close(register_patient[1]);
+    close(patient_register[0]);
+    close(register_patient[0]);
 
     do {
         printf("Doctor %d\n", getpid());
@@ -17,14 +29,8 @@ void doctor_routine(int i) {
         if (drq_cnt[i] > 0) {
             sem_post(drq_cnt_lock[i]);
             examine_patient(i);
-        }
-        sem_post(drq_cnt_lock[i]);
-
-        if (stop_treating) {
-            sem_wait(drq_lock[i]);
-            dr_p_cnt[i] = dr_limits[i];
-            sem_post(drq_lock[i]);
-            done = 1;
+        } else {
+            sem_post(drq_cnt_lock[i]);
         }
 
         sem_wait(cs_lock);
@@ -62,7 +68,7 @@ void examine_patient(int dr_id) {
     // printf("Doctor %d before reading from patient\n", dr_id);
 
     if (read(patient_doctor[dr_id][0], &p_pid, sizeof(pid_t)) < 0) {
-        perror("read");
+        perror("read doctor");
         exit(5);
     }
     printf("Doctor %d examining patient %d\n", dr_id, p_pid);
@@ -84,7 +90,7 @@ void examine_patient(int dr_id) {
     }
 
     if (write(doctor_patient[dr_id][1], &spec_id, sizeof(int)) < 0) {
-        perror("write");
+        perror("write doctor");
         exit(5);
     }
 

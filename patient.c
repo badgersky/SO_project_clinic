@@ -43,15 +43,6 @@ void patient_routine(int i) {
     int reg_resp = 0, dr_id, doc_resp1 = -1, doc_resp2 = -1;
     dr_id = get_rand_id();
 
-    for (int j = 0; j < DR_NUM; j++) {
-        if (j != dr_id) {
-            close(patient_doctor[j][0]);
-            close(patient_doctor[j][1]);
-            close(doctor_patient[j][0]);
-            close(doctor_patient[j][1]);
-        }
-    }
-
     sem_wait(cs_lock);
     if (*clinic_state == 1) {
         sem_post(cs_lock);
@@ -81,7 +72,7 @@ void patient_routine(int i) {
         } else if (doc_resp1 == -1) {
             leave_clinic();
         }
-        
+
         if (doc_resp2 == -1) {
             leave_clinic();
         }
@@ -103,13 +94,13 @@ int go_to_doc(int dr_id) {
 
     // printf("patient %d writing to doctor %d\n", getpid(), dr_id);
     if (write(patient_doctor[dr_id][1], &pid, sizeof(pid_t)) < 0) {
-        perror("write");
+        perror("write patient doc");
         exit(3);
     }
 
     // printf("patient %d reading from doctor %d\n", getpid(), dr_id);
     if (read(doctor_patient[dr_id][0], &doc_resp, sizeof(int)) < 0) {
-        perror("read");
+        perror("read patient doc");
         exit(3);
     }
     // printf("Patient %d received response %d from doctor %d\n", pid, doc_resp, dr_id);
@@ -136,18 +127,18 @@ int patient_registration(int dr_id) {
 
     // printf("patient %d writing pid to register\n", getpid());
     if (write(patient_register[1], &pid, sizeof(pid_t)) < 0) {
-        perror("write");
+        perror("write patient reg");
         exit(3);
     }
     // printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
     if (write(patient_register[1], &dr_id, sizeof(int)) < 0) {
-        perror("write");
+        perror("write patient reg");
         exit(3);
     }
     
     // printf("patient %d reading register response\n", getpid());
     if (read(register_patient[0], &reg_resp, sizeof(int)) < 0) {
-        perror("read");
+        perror("read patient reg");
         exit(3);
     }
     printf("patient %d, registers response: %d\n", getpid(), reg_resp);
@@ -177,6 +168,12 @@ void leave_queue() {
 
 void leave_clinic() {
     printf("patient %d leaving clinic\n", getpid());
+    for (int j = 0; j < DR_NUM; j++) {
+        close(patient_doctor[j][0]);
+        close(patient_doctor[j][1]);
+        close(doctor_patient[j][0]);
+        close(doctor_patient[j][1]);
+    }
     sem_wait(p_cnt_lock);
     if (*p_cnt > 0) *p_cnt -= 1;
     sem_post(p_cnt_lock);

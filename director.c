@@ -22,11 +22,11 @@ void d_sigusr2_handler(int sig) {
 void director_routine() {
     signal(SIGUSR2, d_sigusr2_handler);
     int full;
-    for (int i = 0; i < DR_NUM; i++) {
-        close(patient_doctor[i][0]);
-        close(patient_doctor[i][1]);
-        close(doctor_patient[i][0]);
-        close(doctor_patient[i][1]);
+    for (int j = 0; j < DR_NUM; j++) {
+        close(patient_doctor[j][0]);
+        close(patient_doctor[j][1]);
+        close(doctor_patient[j][0]);
+        close(doctor_patient[j][1]);
     }
 
     close(patient_register[1]);
