@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock;;
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock[6];
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -132,6 +132,13 @@ void initialize_sem() {
             exit(2);
         }
         sem_init(drq_cnt_lock[i], 1, 1);
+
+        pdrq_pids_lock[i] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+        if (pdrq_pids_lock[i] == MAP_FAILED) {
+            perror("mmap");
+            exit(2);
+        }
+        sem_init(pdrq_pids_lock[i], 1, 1);
     }
 
     sem_init(reg_queue, 1, 1);
@@ -173,6 +180,10 @@ void destroy_sem() {
             exit(2);
         } 
         if (munmap(drq_cnt_lock[i], sizeof(sem_t)) < 0) {
+            perror("munmap");
+            exit(2);
+        } 
+        if (munmap(pdrq_pids_lock[i], sizeof(sem_t)) < 0) {
             perror("munmap");
             exit(2);
         } 

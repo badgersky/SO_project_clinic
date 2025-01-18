@@ -75,9 +75,8 @@ typedef struct {
 extern pid_tracker* pids;
 
 // doctors queues pid tracker
-pid_t* pdrq_pids[6];
-
-sem_t* pdrq_pids_lock;
+extern pid_t* pdrq_pids[6];
+extern sem_t* pdrq_pids_lock[6];
 
 // emergency
 extern int* emergency;

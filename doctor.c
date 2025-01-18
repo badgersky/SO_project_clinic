@@ -18,13 +18,18 @@ void doctor_routine(int i) {
         }
     }
 
+    if (stop_treating) {
+        sem_wait(drq_lock[i]);
+        dr_p_cnt[i] = dr_limits[i];
+        sem_post(drq_lock[i]);
+    }
+
     close(patient_register[1]);
     close(register_patient[1]);
     close(patient_register[0]);
     close(register_patient[0]);
 
     do {
-        printf("Doctor %d\n", getpid());
         sem_wait(drq_cnt_lock[i]);
         if (drq_cnt[i] > 0) {
             sem_post(drq_cnt_lock[i]);
@@ -73,20 +78,29 @@ void examine_patient(int dr_id) {
     }
     printf("Doctor %d examining patient %d\n", dr_id, p_pid);
 
-    if (spec_id >= 0 && spec_id <= 3) {
-        sem_wait(drq_lock[dr_id]);
-        if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
-            dr_p_cnt[dr_id] += 1;
-            printf("Doctor %d registering patient %d to doctor %d\n", dr_id, p_pid, spec_id);
-        } else {
-            char* msg = (char*) malloc(sizeof(char) * BUFFER);
-            sprintf(msg, "%d - skierowanie do %d - wystawił doktor %d\n", p_pid, spec_id, dr_id);
-            sem_wait(report_lock);
-            write_report(msg);
-            sem_post(report_lock);
-            free(msg);
-        }
-        sem_post(drq_lock[dr_id]);
+    if (stop_treating) {
+        char* msg = (char*) malloc(sizeof(char) * BUFFER);
+        sprintf(msg, "%d - skierowanie do %d - wystawił doktor %d\n", p_pid, spec_id, dr_id);
+        sem_wait(report_lock);
+        write_report(msg);
+        sem_post(report_lock);
+        free(msg);
+    } else {
+        if (spec_id >= 0 && spec_id <= 3) {
+            sem_wait(drq_lock[dr_id]);
+            if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
+                dr_p_cnt[dr_id] += 1;
+                printf("Doctor %d registering patient %d to doctor %d\n", dr_id, p_pid, spec_id);
+            } else {
+                char* msg = (char*) malloc(sizeof(char) * BUFFER);
+                sprintf(msg, "%d - skierowanie do %d - wystawił doktor %d\n", p_pid, spec_id, dr_id);
+                sem_wait(report_lock);
+                write_report(msg);
+                sem_post(report_lock);
+                free(msg);
+            }
+            sem_post(drq_lock[dr_id]);
+        }   
     }
 
     if (write(doctor_patient[dr_id][1], &spec_id, sizeof(int)) < 0) {

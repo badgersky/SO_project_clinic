@@ -67,7 +67,7 @@ void patient_routine(int i) {
         if (doc_resp1 >= 0) {
             sem_wait(dr_queue[doc_resp1]);
             printf("patient %d going to doc %d\n", getpid(), doc_resp1);
-            doc_resp2 = go_to_doc(doc_resp1);
+            doc_resp2 = go_to_doc(dr_id);
             sem_post(dr_queue[doc_resp1]);
         } else if (doc_resp1 == -1) {
             leave_clinic();
