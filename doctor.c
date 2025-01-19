@@ -23,8 +23,11 @@ void doctor_routine(int i) {
     close(patient_register[0]);
     close(register_patient[0]);
 
+    close(patient_doctor[i][1]);
+    close(doctor_patient[i][0]);
+
     do {
-        printf("Doctor %d\n", getpid());
+        // printf("Doctor %d\n", getpid());
         sem_wait(drq_cnt_lock[i]);
         if (drq_cnt[i] > 0) {
             sem_post(drq_cnt_lock[i]);
@@ -61,9 +64,6 @@ void examine_patient(int dr_id) {
     pid_t p_pid;
     int r = rand() % 10;
     int spec_id, doc_resp = -1;
-
-    close(patient_doctor[dr_id][1]);
-    close(doctor_patient[dr_id][0]);
 
     sem_wait(dr_pipe_lock[dr_id]);
 

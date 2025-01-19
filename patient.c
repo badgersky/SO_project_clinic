@@ -48,15 +48,15 @@ void patient_routine(int i) {
     }
     
     for (int j = 0; j < DR_NUM; j++) {
-    if (j == dr_id || (spec_id != -1 && j == spec_id)) {
-        continue;
+        if (j == dr_id || (spec_id != -1 && j == spec_id)) {
+            continue;
+        }
+        
+        close(patient_doctor[j][0]);
+        close(patient_doctor[j][1]);
+        close(doctor_patient[j][0]);
+        close(doctor_patient[j][1]);
     }
-    
-    close(patient_doctor[j][0]);
-    close(patient_doctor[j][1]);
-    close(doctor_patient[j][0]);
-    close(doctor_patient[j][1]);
-}
 
     if (m) {
         if (pthread_create(&ch_id, NULL, &child_routine, NULL) != 0) {
