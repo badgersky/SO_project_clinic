@@ -31,6 +31,32 @@ void patient_routine(int i) {
     sem_post(pids->pid_lock);
 
     int m = is_minor();
+    int spec_id;
+    int r = rand() % 10;
+    int reg_resp = 0, dr_id, doc_resp1 = -1, doc_resp2 = -1;
+    dr_id = get_rand_id();
+
+    if (r < 2) {
+        if (i == 4 || i == 5) {
+            spec_id = rand() % (DR_NUM - 2);
+            // printf("%d SPEC ID UPDATED! %d\n", getpid(), spec_id);
+        } else {
+            spec_id = -1;
+        }
+    } else {
+        spec_id = -1;
+    }
+    
+    for (int j = 0; j < DR_NUM; j++) {
+    if (j == dr_id || (spec_id != -1 && j == spec_id)) {
+        continue;
+    }
+    
+    close(patient_doctor[j][0]);
+    close(patient_doctor[j][1]);
+    close(doctor_patient[j][0]);
+    close(doctor_patient[j][1]);
+}
 
     if (m) {
         if (pthread_create(&ch_id, NULL, &child_routine, NULL) != 0) {
@@ -39,9 +65,6 @@ void patient_routine(int i) {
         }
         pthread_detach(ch_id);
     }
-
-    int reg_resp = 0, dr_id, doc_resp1 = -1, doc_resp2 = -1;
-    dr_id = get_rand_id();
 
     sem_wait(cs_lock);
     if (*clinic_state == 1) {
@@ -54,24 +77,26 @@ void patient_routine(int i) {
         sem_post(reg_queue);
 
         leave_queue();
-            
+        
+        printf("Patient %d, spec id %d, doctor id %d\n", getpid(), spec_id, dr_id);
         if (reg_resp > 0) {
             sem_wait(dr_queue[dr_id]);
             printf("patient %d going to doc %d\n", getpid(), dr_id);
-            doc_resp1 = go_to_doc(dr_id);
+            doc_resp1 = go_to_doc(dr_id, spec_id);
             sem_post(dr_queue[dr_id]);
         } else if (reg_resp == 0) {
             leave_clinic();
         }
-
+    
         if (doc_resp1 >= 0) {
             sem_wait(dr_queue[doc_resp1]);
             printf("patient %d going to doc %d\n", getpid(), doc_resp1);
-            doc_resp2 = go_to_doc(dr_id);
+            doc_resp2 = go_to_doc(doc_resp1, -1);
             sem_post(dr_queue[doc_resp1]);
         } else if (doc_resp1 == -1) {
             leave_clinic();
         }
+        
 
         if (doc_resp2 == -1) {
             leave_clinic();
@@ -82,7 +107,7 @@ void patient_routine(int i) {
     }
 }
 
-int go_to_doc(int dr_id) {
+int go_to_doc(int dr_id, int spec_id) {
     sem_wait(drq_cnt_lock[dr_id]);
     drq_cnt[dr_id] += 1;
     sem_post(drq_cnt_lock[dr_id]);
@@ -94,6 +119,11 @@ int go_to_doc(int dr_id) {
 
     printf("patient %d writing to doctor %d\n", getpid(), dr_id);
     if (write(patient_doctor[dr_id][1], &pid, sizeof(pid_t)) < 0) {
+        perror("write patient doc");
+        exit(3);
+    }
+    printf("patient %d writing spec id %d to doctor %d\n", getpid(), spec_id, dr_id);
+    if (write(patient_doctor[dr_id][1], &spec_id, sizeof(int)) < 0) {
         perror("write patient doc");
         exit(3);
     }
@@ -125,23 +155,23 @@ int patient_registration(int dr_id) {
     close(patient_register[0]);
     close(register_patient[1]);
 
-    printf("patient %d writing pid to register\n", getpid());
+    // printf("patient %d writing pid to register\n", getpid());
     if (write(patient_register[1], &pid, sizeof(pid_t)) < 0) {
         perror("write patient reg");
         exit(3);
     }
-    printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
+    // printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
     if (write(patient_register[1], &dr_id, sizeof(int)) < 0) {
         perror("write patient reg");
         exit(3);
     }
     
-    printf("patient %d reading register response\n", getpid());
+    // printf("patient %d reading register response\n", getpid());
     if (read(register_patient[0], &reg_resp, sizeof(int)) < 0) {
         perror("read patient reg");
         exit(3);
     }
-    printf("patient %d, registers response: %d\n", getpid(), reg_resp);
+    // printf("patient %d, registers response: %d\n", getpid(), reg_resp);
     return reg_resp;
 }
 
@@ -195,7 +225,6 @@ void create_patients() {
             } else {
                 sem_post(emergency_lock);
             }
-            
         }
     }
 }

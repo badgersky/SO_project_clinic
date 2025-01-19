@@ -18,24 +18,27 @@ void doctor_routine(int i) {
         }
     }
 
-    if (stop_treating) {
-        sem_wait(drq_lock[i]);
-        dr_p_cnt[i] = dr_limits[i];
-        sem_post(drq_lock[i]);
-    }
-
     close(patient_register[1]);
     close(register_patient[1]);
     close(patient_register[0]);
     close(register_patient[0]);
 
     do {
+        printf("Doctor %d\n", getpid());
         sem_wait(drq_cnt_lock[i]);
         if (drq_cnt[i] > 0) {
             sem_post(drq_cnt_lock[i]);
             examine_patient(i);
         } else {
             sem_post(drq_cnt_lock[i]);
+        }
+
+        if (stop_treating) {
+            sem_wait(drq_lock[i]);
+            dr_p_cnt[i] = dr_limits[i];
+            sem_post(drq_lock[i]);
+            done = 1;
+            printf("Doctor %d is leaving\n", i);
         }
 
         sem_wait(cs_lock);
@@ -57,30 +60,28 @@ void doctor_routine(int i) {
 void examine_patient(int dr_id) {
     pid_t p_pid;
     int r = rand() % 10;
-    int spec_id = -1;
-
-    if (r < 2) {
-        if (dr_id == 4 || dr_id == 5) {
-            spec_id = rand() % (DR_NUM - 2);
-        }
-    }
+    int spec_id, doc_resp = -1;
 
     close(patient_doctor[dr_id][1]);
     close(doctor_patient[dr_id][0]);
 
     sem_wait(dr_pipe_lock[dr_id]);
 
-    printf("Doctor %d before reading from patient\n", dr_id);
-
+    // printf("Doctor %d before reading from patient\n", dr_id);
     if (read(patient_doctor[dr_id][0], &p_pid, sizeof(pid_t)) < 0) {
         perror("read doctor");
         exit(5);
     }
-    printf("Doctor %d examining patient %d\n", dr_id, p_pid);
+    if (read(patient_doctor[dr_id][0], &spec_id, sizeof(int)) < 0) {
+        perror("read doctor");
+        exit(5);
+    }
+    printf("Doctor received spec id %d from patient %d\n", spec_id, p_pid);
+    // printf("Doctor %d %d examining patient %d\n", dr_id, getpid(), p_pid);
 
     if (stop_treating) {
         char* msg = (char*) malloc(sizeof(char) * BUFFER);
-        sprintf(msg, "%d - skierowanie do %d - wystawił doktor %d\n", p_pid, spec_id, dr_id);
+        sprintf(msg, "%d - skierowanie do %d - koniec pracy doktora\n", p_pid, dr_id);
         sem_wait(report_lock);
         write_report(msg);
         sem_post(report_lock);
@@ -90,6 +91,7 @@ void examine_patient(int dr_id) {
             sem_wait(drq_lock[dr_id]);
             if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
                 dr_p_cnt[dr_id] += 1;
+                doc_resp = spec_id;
                 printf("Doctor %d registering patient %d to doctor %d\n", dr_id, p_pid, spec_id);
             } else {
                 char* msg = (char*) malloc(sizeof(char) * BUFFER);
@@ -103,7 +105,7 @@ void examine_patient(int dr_id) {
         }   
     }
 
-    if (write(doctor_patient[dr_id][1], &spec_id, sizeof(int)) < 0) {
+    if (write(doctor_patient[dr_id][1], &doc_resp, sizeof(int)) < 0) {
         perror("write doctor");
         exit(5);
     }
