@@ -411,3 +411,9 @@ void remove_pid(int dr_id, pid_t pid) {
         }
     }
 }
+
+void print_sem_value(sem_t* s) {
+    int sem_val;
+    sem_getvalue(s, &sem_val);
+    printf("sem value: %d\n", sem_val);
+}

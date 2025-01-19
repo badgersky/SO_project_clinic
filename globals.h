@@ -96,3 +96,4 @@ void initialize_pids();
 void cleanup_pids();
 void insert_pid(int dr_id, pid_t pid);
 void remove_pid(int dr_id, pid_t pid);
+void print_sem_value(sem_t* s);

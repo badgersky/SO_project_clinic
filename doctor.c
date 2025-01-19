@@ -43,7 +43,7 @@ void doctor_routine(int i) {
             done = 1;
             printf("Doctor %d is leaving\n", i);
         }
-
+        
         sem_wait(cs_lock);
         sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
@@ -76,8 +76,8 @@ void examine_patient(int dr_id) {
         perror("read doctor");
         exit(5);
     }
-    printf("Doctor received spec id %d from patient %d\n", spec_id, p_pid);
-    // printf("Doctor %d %d examining patient %d\n", dr_id, getpid(), p_pid);
+    // printf("Doctor received spec id %d from patient %d\n", spec_id, p_pid);
+    printf("Doctor %d %d examining patient %d\n", dr_id, getpid(), p_pid);
 
     if (stop_treating) {
         char* msg = (char*) malloc(sizeof(char) * BUFFER);
