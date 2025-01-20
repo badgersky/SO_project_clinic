@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -97,3 +98,4 @@ void cleanup_pids();
 void insert_pid(int dr_id, pid_t pid);
 void remove_pid(int dr_id, pid_t pid);
 void print_sem_value(sem_t* s);
+void* wait_for_processes(void* arg);

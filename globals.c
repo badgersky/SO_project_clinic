@@ -417,3 +417,13 @@ void print_sem_value(sem_t* s) {
     sem_getvalue(s, &sem_val);
     printf("sem value: %d\n", sem_val);
 }
+
+void* wait_for_processes(void* arg) {
+    int proc_num = DR_NUM + MAX_P + 2;
+    for (int i = 0; i < proc_num; i++) {
+        if (wait(0) < 0) {
+            perror("wait");
+            exit(4);
+        }
+    }
+}

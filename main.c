@@ -4,6 +4,7 @@
 #include <sys/mman.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "register.h"
 #include "globals.h"
@@ -22,10 +23,9 @@ int main() {
     create_doctors();
     create_patients();
 
-    wait_patients();
-    wait_doctors();
-    wait_registers();
-    wait_director();
+    pthread_t wait_t;
+    pthread_create(&wait_t, NULL, *wait_for_processes, NULL);
+    pthread_join(wait_t, NULL);
 
     cleanup_pids();
     free_variables();
