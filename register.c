@@ -13,14 +13,6 @@ void register_routine() {
     }
 
     do {
-        sem_wait(p_cnt_lock);
-        printf("Number of patients inside: %d\n", *p_cnt);
-        sem_post(p_cnt_lock);
-
-        sem_wait(rq_lock);
-        printf("Number of patients in register queue: %d\n", *rq_cnt);
-        sem_post(rq_lock);
-
         sem_wait(rq_lock);
         if (*rq_cnt > 0) {
             sem_post(rq_lock);
@@ -31,14 +23,14 @@ void register_routine() {
         }
 
         sem_wait(cs_lock);
-        sem_wait(rq_lock);
-        sem_wait(p_cnt_lock);
-        if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
-            printf("Closing registers\n");
-            done = 1;
+        if (*clinic_state == 0) {
+            sem_wait(p_cnt_lock);
+            if (*p_cnt == 0) {
+                printf("Closing registers\n");
+                done = 1;
+            }
+            sem_post(p_cnt_lock);
         }
-        sem_post(p_cnt_lock);
-        sem_post(rq_lock);
         sem_post(cs_lock);
         sleep(1);
     } while(!done);

@@ -45,16 +45,14 @@ void doctor_routine(int i) {
         }
         
         sem_wait(cs_lock);
-        sem_wait(rq_lock);
         sem_wait(p_cnt_lock);
-        if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
+        if (*clinic_state == 0 && *p_cnt == 0) {
             printf("Doctors %d leaving\n", i);
             done = 1;
         }
         sem_post(p_cnt_lock);
-        sem_post(rq_lock);
         sem_post(cs_lock);
-        // sleep(1);
+        sleep(1);
     } while(!done);
 
     exit(0);

@@ -183,9 +183,11 @@ void enter_clinic() {
     sem_wait(rq_capacity);
     sem_wait(rq_lock);
     *rq_cnt += 1;
+    printf("patients in register queue: %d\n", *rq_cnt);
     sem_post(rq_lock);
     sem_wait(p_cnt_lock);
     *p_cnt += 1;
+    printf("Number of patients inside: %d\n", *p_cnt);
     sem_post(p_cnt_lock);
 }
 
