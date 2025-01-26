@@ -66,41 +66,49 @@ void patient_routine(int i) {
         pthread_detach(ch_id);
     }
 
-    enter_clinic();
+    sem_wait(cs_lock);
+    if (*clinic_state != 0) {
+        sem_post(cs_lock);
+        enter_clinic();
 
-    sem_wait(reg_queue);
-    printf("patient %d goind to registration\n", getpid());
-    reg_resp = patient_registration(dr_id);
-    sem_post(reg_queue);
+        sem_wait(reg_queue);
+        printf("patient %d goind to registration\n", getpid());
+        reg_resp = patient_registration(dr_id);
+        sem_post(reg_queue);
 
-    leave_queue();
-    
-    // printf("Patient %d, spec id %d, doctor id %d\n", getpid(), spec_id, dr_id);
-    if (reg_resp > 0) {
-        sem_wait(dr_queue[dr_id]);
-        printf("patient %d going to doc %d\n", getpid(), dr_id);
-        doc_resp1 = go_to_doc(dr_id, spec_id);
-        sem_post(dr_queue[dr_id]);
-    } else if (reg_resp == 0) {
-        printf("patient %d, no free visits to doc %d\n", getpid(), dr_id);
-        leave_clinic();
+        leave_queue();
+        
+        // printf("Patient %d, spec id %d, doctor id %d\n", getpid(), spec_id, dr_id);
+        if (reg_resp > 0) {
+            sem_wait(dr_queue[dr_id]);
+            printf("patient %d going to doc %d\n", getpid(), dr_id);
+            doc_resp1 = go_to_doc(dr_id, spec_id);
+            sem_post(dr_queue[dr_id]);
+        } else if (reg_resp == 0) {
+            printf("patient %d, no free visits to doc %d\n", getpid(), dr_id);
+            leave_clinic();
+        }
+
+        if (doc_resp1 >= 0) {
+            sem_wait(dr_queue[doc_resp1]);
+            printf("patient %d going to specialist %d after poz visit\n", getpid(), doc_resp1);
+            doc_resp2 = go_to_doc(doc_resp1, -1);
+            sem_post(dr_queue[doc_resp1]);
+        } else if (doc_resp1 == -1) {
+            printf("patient %d leaving after poz visit\n", getpid());
+            leave_clinic();
+        }
+        
+
+        if (doc_resp2 == -1) {
+            printf("patient %d leaving after poz and specialist visit\n", getpid());
+            leave_clinic();
+        }
+    } else {
+        sem_post(cs_lock);
+        exit(0);
     }
 
-    if (doc_resp1 >= 0) {
-        sem_wait(dr_queue[doc_resp1]);
-        printf("patient %d going to specialist %d after poz visit\n", getpid(), doc_resp1);
-        doc_resp2 = go_to_doc(doc_resp1, -1);
-        sem_post(dr_queue[doc_resp1]);
-    } else if (doc_resp1 == -1) {
-        printf("patient %d leaving after poz visit\n", getpid());
-        leave_clinic();
-    }
-    
-
-    if (doc_resp2 == -1) {
-        printf("patient %d leaving after poz and specialist visit\n", getpid());
-        leave_clinic();
-    }
 }
 
 int go_to_doc(int dr_id, int spec_id) {
@@ -206,14 +214,11 @@ void create_patients() {
         if (pid == 0) {
             srand(getpid());
             sem_wait(emergency_lock);
-            sem_wait(cs_lock);
-            if (!*emergency || *clinic_state) {
+            if (!*emergency) {
                 sem_post(emergency_lock);
-                sem_post(cs_lock);
                 patient_routine(i);
             } else {
                 sem_post(emergency_lock);
-                sem_post(cs_lock);
             }
         }
     }
