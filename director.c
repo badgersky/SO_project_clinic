@@ -3,7 +3,7 @@
 int done = 0;
 
 void d_sigusr2_handler(int sig) {
-    printf("Doctor %d received SIGUSR2, forwarding to all patients...\n", getpid());
+    printf("Director %d received SIGUSR2, forwarding to all patients...\n", getpid());
 
     sem_wait(emergency_lock);
     *emergency = 1;
@@ -59,8 +59,14 @@ void close_clinic() {
     if (*clinic_state == 1) {
         printf("closing clinic\n");
         *clinic_state = 0;
+        sem_post(cs_lock);
+        for (int i = 0; i < DR_NUM; i++) {
+            kill(dr_pids[i], SIGUSR2);
+        }
+        kill(*r_pid, SIGUSR2);
+    } else {
+        sem_post(cs_lock);
     }
-    sem_post(cs_lock);
 }
 
 void create_director() {

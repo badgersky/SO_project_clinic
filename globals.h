@@ -14,7 +14,7 @@
 #define MAX_P 100
 
 #define TP 0
-#define TK 100
+#define TK 40
 
 #define BUFFER 100
 
@@ -26,10 +26,14 @@
 #define X4 1
 #define X3 1
 #define X2 1
-#define X1 1
+#define X1 2
 
 extern int protection;
 extern int visibility;
+
+// doctors and registers pids
+extern pid_t* r_pid;
+extern pid_t* dr_pids;
 
 // entering clinic, register control, queues
 extern sem_t* reg_queue;

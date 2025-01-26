@@ -17,6 +17,9 @@ int* dr_limits;
 int* dr_p_cnt;
 int* drq_cnt;
 
+pid_t* r_pid;
+pid_t* dr_pids;
+
 int patient_doctor[6][2];
 int doctor_patient[6][2];
 
@@ -269,10 +272,20 @@ void share_variables() {
         perror("mmap");
         exit(4);
     }
+    r_pid = mmap(NULL, sizeof(pid_t), protection, visibility, -1, 0);
+    if (r_pid == MAP_FAILED) {
+        perror("mmap");
+        exit(4);
+    }
+    dr_pids = mmap(NULL, sizeof(pid_t) * DR_NUM, protection, visibility, -1, 0);
+    if (dr_pids == MAP_FAILED) {
+        perror("mmap");
+        exit(4);
+    }
 
     for (int i = 0; i < DR_NUM; i++) {
         pdrq_pids[i] = mmap(NULL, sizeof(pid_t) * MAX_P, protection, visibility, -1, 0);
-        if (pdrq_pids[i] == MAP_FAILED) {
+        if (pdrq_pids == MAP_FAILED) {
             perror("mmap");
             exit(4);
         }
@@ -309,6 +322,7 @@ void init_variables() {
     *clinic_state = 1;
     *p_cnt = 0;
     *emergency = 0;
+    *r_pid = 0;
 
     dr_limits[0] = X5;
     dr_limits[1] = X4;
@@ -330,6 +344,7 @@ void init_variables() {
         }
 
         drq_cnt[i] = 0;
+        dr_pids[i] = 0;
 
         for (int j = 0; j < MAX_P; j++) {
             pdrq_pids[i][j] = -1;
@@ -372,6 +387,14 @@ void free_variables() {
         exit(4);
     }
     if (munmap(emergency, sizeof(int) * DR_NUM) < 0) {
+        perror("munmap");
+        exit(4);
+    }
+    if (munmap(r_pid, sizeof(pid_t)) < 0) {
+        perror("munmap");
+        exit(4);
+    }
+    if (munmap(dr_pids, sizeof(pid_t) * DR_NUM) < 0) {
         perror("munmap");
         exit(4);
     }

@@ -6,10 +6,22 @@ void sigusr1_handler(int sig) {
     stop_treating = 1;
 }
 
+void sigusr2_doc_handler(int sig) {
+    while (1) {
+        if (MAX_CAPACITY - get_sem_value(clinic_capacity) == 0) {
+            break;
+        }
+    }
+
+    printf("Doctor %d leaving\n", getpid());
+    exit(0);
+}
+
 void doctor_routine(int i) {
     int done = 0;
 
     signal(SIGUSR1, sigusr1_handler);
+    signal(SIGUSR2, sigusr2_doc_handler);
     for (int j = 0; j < DR_NUM; j++) {
         if (j != i) {
             close(patient_doctor[j][0]);
@@ -109,6 +121,8 @@ void create_doctors() {
         if (pid == 0) {
             srand(time(0) + i);
             doctor_routine(i);
+        } else {
+            dr_pids[i] = pid;
         }
     }
 }

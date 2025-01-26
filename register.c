@@ -1,6 +1,17 @@
 #include "register.h"
 
+void sigusr2_reg_handler(int sig) {
+    while (1) {
+        if (MAX_CAPACITY - get_sem_value(clinic_capacity) == 0) {
+            break;
+        }
+    }
+
+    exit(0);
+}
+
 void register_routine() {
+    signal(SIGUSR2, sigusr2_reg_handler);
     int* desks_open = (int*) malloc(sizeof(int));
     *desks_open = 1;
     int done = 0;
@@ -59,7 +70,7 @@ void process_patient() {
         if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
             dr_p_cnt[dr_id] += 1;
             reg_resp = 1;
-            printf("registering patient %d to doctor %d\n", p_pid, dr_id);
+            printf("register %d registering patient %d to doctor %d\n", getpid(), p_pid, dr_id);
         } else {
             printf("no free visit hours to doctor %d\n", dr_id);
         }
@@ -102,6 +113,8 @@ void create_registers() {
     }
     if (pid == 0) {
         register_routine();
+    } else {
+        *r_pid = pid;
     }
 }
 
