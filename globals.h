@@ -11,7 +11,7 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 1000
+#define MAX_P 100
 
 #define TP 0
 #define TK 100
@@ -21,6 +21,12 @@
 #define REG_NUM 2
 #define MAX_QUEUE 15
 #define MAX_CAPACITY 30
+
+#define X5 1
+#define X4 1
+#define X3 1
+#define X2 1
+#define X1 1
 
 extern int protection;
 extern int visibility;
@@ -98,4 +104,5 @@ void cleanup_pids();
 void insert_pid(int dr_id, pid_t pid);
 void remove_pid(int dr_id, pid_t pid);
 void print_sem_value(sem_t* s);
+int get_sem_value(sem_t* s);
 void* wait_for_processes(void* arg);

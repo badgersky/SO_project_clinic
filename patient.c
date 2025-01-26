@@ -174,18 +174,9 @@ int patient_registration(int dr_id) {
 void enter_clinic() {
     sem_wait(clinic_capacity);
     sem_wait(rq_capacity);
-    // sem_wait(rq_lock);
-    // *rq_cnt += 1;
-    // sem_post(rq_lock);
-    // sem_wait(p_cnt_lock);
-    // *p_cnt += 1;
-    // sem_post(p_cnt_lock);
 }
 
 void leave_queue() {
-    // sem_wait(rq_lock);
-    // if (*rq_cnt > 0) *rq_cnt -= 1;
-    // sem_post(rq_lock);
     sem_post(rq_capacity);
 }
 
@@ -197,9 +188,9 @@ void leave_clinic() {
         close(doctor_patient[j][0]);
         close(doctor_patient[j][1]);
     }
-    // sem_wait(p_cnt_lock);
-    // if (*p_cnt > 0) *p_cnt -= 1;
-    // sem_post(p_cnt_lock);
+    close(patient_register[1]);
+    close(register_patient[0]);
+
     sem_post(clinic_capacity);
     exit(0);
 }

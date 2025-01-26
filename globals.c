@@ -310,12 +310,12 @@ void init_variables() {
     *p_cnt = 0;
     *emergency = 0;
 
-    dr_limits[0] = 10;
-    dr_limits[1] = 10;
-    dr_limits[2] = 10;
-    dr_limits[3] = 10;
-    dr_limits[4] = 20;
-    dr_limits[5] = 20;
+    dr_limits[0] = X5;
+    dr_limits[1] = X4;
+    dr_limits[2] = X3;
+    dr_limits[3] = X2;
+    dr_limits[4] = X1;
+    dr_limits[5] = X1;
 
     for (int i = 0; i < DR_NUM; i++) {
         dr_p_cnt[i] = 0;
@@ -416,6 +416,12 @@ void print_sem_value(sem_t* s) {
     int sem_val;
     sem_getvalue(s, &sem_val);
     printf("sem value: %d\n", sem_val);
+}
+
+int get_sem_value(sem_t* s) {
+    int sem_val;
+    sem_getvalue(s, &sem_val);
+    return sem_val;
 }
 
 void* wait_for_processes(void* arg) {

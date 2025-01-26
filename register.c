@@ -4,6 +4,10 @@ void register_routine() {
     int* desks_open = (int*) malloc(sizeof(int));
     *desks_open = 1;
     int done = 0;
+    int data, ret;
+
+    close(register_patient[0]);
+    close(patient_register[1]);
 
     for (int i = 0; i < DR_NUM; i++) {
         close(patient_doctor[i][0]);
@@ -13,27 +17,8 @@ void register_routine() {
     }
 
     do {
-        // sem_wait(p_cnt_lock);
-        // printf("Number of patients inside: %d\n", *p_cnt);
-        // sem_post(p_cnt_lock);
-
-        // sem_wait(rq_lock);
-        // printf("Number of patients in register queue: %d\n", *rq_cnt);
-        // sem_post(rq_lock);
-
         open_close_register(desks_open);
         process_patient();
-
-        // sem_wait(cs_lock);
-        // sem_wait(rq_lock);
-        // sem_wait(p_cnt_lock);
-        // if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
-        //     printf("Closing registers\n");
-        //     done = 1;
-        // }
-        // sem_post(p_cnt_lock);
-        // sem_post(rq_lock);
-        // sem_post(cs_lock);
         // sleep(1);
     } while(!done);
     
@@ -44,8 +29,6 @@ void register_routine() {
 void process_patient() {
     int dr_id, reg_resp = 0;
     pid_t p_pid;
-    close(register_patient[0]);
-    close(patient_register[1]);
 
     // printf("before reg_pipe_lock\n");
     sem_wait(reg_pipe_lock);
