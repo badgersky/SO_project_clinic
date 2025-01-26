@@ -11,10 +11,10 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 40
+#define MAX_P 1000
 
 #define TP 0
-#define TK 30
+#define TK 100
 
 #define BUFFER 100
 

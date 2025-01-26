@@ -66,47 +66,40 @@ void patient_routine(int i) {
         pthread_detach(ch_id);
     }
 
-    sem_wait(cs_lock);
-    if (*clinic_state == 1) {
-        sem_post(cs_lock);
-        enter_clinic();
+    enter_clinic();
 
-        sem_wait(reg_queue);
-        printf("patient %d goind to registration\n", getpid());
-        reg_resp = patient_registration(dr_id);
-        sem_post(reg_queue);
+    sem_wait(reg_queue);
+    printf("patient %d goind to registration\n", getpid());
+    reg_resp = patient_registration(dr_id);
+    sem_post(reg_queue);
 
-        leave_queue();
-        
-        // printf("Patient %d, spec id %d, doctor id %d\n", getpid(), spec_id, dr_id);
-        if (reg_resp > 0) {
-            sem_wait(dr_queue[dr_id]);
-            printf("patient %d going to doc %d\n", getpid(), dr_id);
-            doc_resp1 = go_to_doc(dr_id, spec_id);
-            sem_post(dr_queue[dr_id]);
-        } else if (reg_resp == 0) {
-            printf("patient %d, no free visits to doc %d\n", getpid(), dr_id);
-            leave_clinic();
-        }
+    leave_queue();
     
-        if (doc_resp1 >= 0) {
-            sem_wait(dr_queue[doc_resp1]);
-            printf("patient %d going to specialist %d after poz visit\n", getpid(), doc_resp1);
-            doc_resp2 = go_to_doc(doc_resp1, -1);
-            sem_post(dr_queue[doc_resp1]);
-        } else if (doc_resp1 == -1) {
-            printf("patient %d leaving after poz visit\n", getpid());
-            leave_clinic();
-        }
-        
+    // printf("Patient %d, spec id %d, doctor id %d\n", getpid(), spec_id, dr_id);
+    if (reg_resp > 0) {
+        sem_wait(dr_queue[dr_id]);
+        printf("patient %d going to doc %d\n", getpid(), dr_id);
+        doc_resp1 = go_to_doc(dr_id, spec_id);
+        sem_post(dr_queue[dr_id]);
+    } else if (reg_resp == 0) {
+        printf("patient %d, no free visits to doc %d\n", getpid(), dr_id);
+        leave_clinic();
+    }
 
-        if (doc_resp2 == -1) {
-            printf("patient %d leaving after poz and specialist visit\n", getpid());
-            leave_clinic();
-        }
-    } else {
-        sem_post(cs_lock);
-        exit(0);
+    if (doc_resp1 >= 0) {
+        sem_wait(dr_queue[doc_resp1]);
+        printf("patient %d going to specialist %d after poz visit\n", getpid(), doc_resp1);
+        doc_resp2 = go_to_doc(doc_resp1, -1);
+        sem_post(dr_queue[doc_resp1]);
+    } else if (doc_resp1 == -1) {
+        printf("patient %d leaving after poz visit\n", getpid());
+        leave_clinic();
+    }
+    
+
+    if (doc_resp2 == -1) {
+        printf("patient %d leaving after poz and specialist visit\n", getpid());
+        leave_clinic();
     }
 }
 
@@ -181,18 +174,18 @@ int patient_registration(int dr_id) {
 void enter_clinic() {
     sem_wait(clinic_capacity);
     sem_wait(rq_capacity);
-    sem_wait(rq_lock);
-    *rq_cnt += 1;
-    sem_post(rq_lock);
-    sem_wait(p_cnt_lock);
-    *p_cnt += 1;
-    sem_post(p_cnt_lock);
+    // sem_wait(rq_lock);
+    // *rq_cnt += 1;
+    // sem_post(rq_lock);
+    // sem_wait(p_cnt_lock);
+    // *p_cnt += 1;
+    // sem_post(p_cnt_lock);
 }
 
 void leave_queue() {
-    sem_wait(rq_lock);
-    if (*rq_cnt > 0) *rq_cnt -= 1;
-    sem_post(rq_lock);
+    // sem_wait(rq_lock);
+    // if (*rq_cnt > 0) *rq_cnt -= 1;
+    // sem_post(rq_lock);
     sem_post(rq_capacity);
 }
 
@@ -204,9 +197,9 @@ void leave_clinic() {
         close(doctor_patient[j][0]);
         close(doctor_patient[j][1]);
     }
-    sem_wait(p_cnt_lock);
-    if (*p_cnt > 0) *p_cnt -= 1;
-    sem_post(p_cnt_lock);
+    // sem_wait(p_cnt_lock);
+    // if (*p_cnt > 0) *p_cnt -= 1;
+    // sem_post(p_cnt_lock);
     sem_post(clinic_capacity);
     exit(0);
 }
@@ -222,11 +215,14 @@ void create_patients() {
         if (pid == 0) {
             srand(getpid());
             sem_wait(emergency_lock);
-            if (!*emergency) {
+            sem_wait(cs_lock);
+            if (!*emergency || *clinic_state) {
                 sem_post(emergency_lock);
+                sem_post(cs_lock);
                 patient_routine(i);
             } else {
                 sem_post(emergency_lock);
+                sem_post(cs_lock);
             }
         }
     }

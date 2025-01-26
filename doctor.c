@@ -28,13 +28,7 @@ void doctor_routine(int i) {
 
     do {
         // printf("Doctor %d\n", getpid());
-        sem_wait(drq_cnt_lock[i]);
-        if (drq_cnt[i] > 0) {
-            sem_post(drq_cnt_lock[i]);
-            examine_patient(i);
-        } else {
-            sem_post(drq_cnt_lock[i]);
-        }
+        examine_patient(i);
 
         if (stop_treating) {
             sem_wait(drq_lock[i]);
@@ -44,17 +38,17 @@ void doctor_routine(int i) {
             printf("Doctor %d is leaving\n", i);
         }
         
-        sem_wait(cs_lock);
-        sem_wait(rq_lock);
-        sem_wait(p_cnt_lock);
-        if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
-            printf("Doctors %d leaving\n", i);
-            done = 1;
-        }
-        sem_post(p_cnt_lock);
-        sem_post(rq_lock);
-        sem_post(cs_lock);
-        sleep(1);
+        // sem_wait(cs_lock);
+        // sem_wait(rq_lock);
+        // sem_wait(p_cnt_lock);
+        // if (*clinic_state == 0 && *p_cnt == 0 && *rq_cnt == 0) {
+        //     printf("Doctors %d leaving\n", i);
+        //     done = 1;
+        // }
+        // sem_post(p_cnt_lock);
+        // sem_post(rq_lock);
+        // sem_post(cs_lock);
+        // sleep(1);
     } while(!done);
 
     exit(0);

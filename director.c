@@ -35,12 +35,12 @@ void director_routine() {
     close(register_patient[0]);
     do {
         printf("Director %d\n", getpid());
-        full = check_limits();
-        if (full == 1) {
-            printf("No free spots to any doctors\n");
-            close_clinic();
-            done = 1;
-        }
+        // full = check_limits();
+        // if (full == 1) {
+        //     printf("No free spots to any doctors\n");
+        //     close_clinic();
+        //     done = 1;
+        // }
 
         *t += 1;
         if (*t >= TK) {
