@@ -42,7 +42,7 @@ void register_routine() {
         sem_post(cs_lock);
         sleep(1);
     } while(!done);
-
+    
     free(desks_open);
     exit(0);
 }
