@@ -25,10 +25,12 @@ void doctor_routine(int i) {
         }
     }
 
-    close(patient_register[1]);
-    close(register_patient[1]);
-    close(patient_register[0]);
-    close(register_patient[0]);
+    for (int j = 0; j < REG_NUM; j++) {
+        close(patient_register[j][1]);
+        close(register_patient[j][1]);
+        close(patient_register[j][0]);
+        close(register_patient[j][0]);
+    }
 
     close(patient_doctor[i][1]);
     close(doctor_patient[i][0]);

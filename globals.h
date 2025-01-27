@@ -37,7 +37,7 @@ extern pid_t* dr_pids;
 extern sem_t* p_lock;
 
 // entering clinic, register control, queues
-extern sem_t* reg_queue;
+extern sem_t* reg_queue[2];
 extern sem_t* rq_lock;
 extern sem_t* clinic_capacity;
 extern sem_t* p_cnt_lock;
@@ -45,6 +45,7 @@ extern sem_t* rq_capacity;
 
 extern int *rq_cnt;
 extern int *p_cnt;
+extern int *desks_open;
 
 // clinic worktime variables
 extern sem_t* cs_lock;
@@ -53,10 +54,10 @@ extern int *t;
 extern int *clinic_state;
 
 // communication between register and patients
-extern int patient_register[2];
-extern int register_patient[2];
+extern int patient_register[2][2];
+extern int register_patient[2][2];
 
-extern sem_t* reg_pipe_lock;
+extern sem_t* reg_pipe_lock[2];
 
 // doctor queue control
 extern sem_t* dr_queue[6];

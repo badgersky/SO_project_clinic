@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock[6], *p_lock;
+sem_t *reg_queue[2], *clinic_capacity, *rq_lock, *reg_pipe_lock[2], *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock[6], *p_lock;
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -9,9 +9,10 @@ int* rq_cnt;
 int* t;
 int* clinic_state;
 int* p_cnt;
+int* desks_open;
 
-int patient_register[2];
-int register_patient[2];
+int patient_register[2][2];
+int register_patient[2][2];
 
 int* dr_limits;
 int* dr_p_cnt;
@@ -61,7 +62,12 @@ void cleanup_pids() {
 }
 
 void initialize_sem() {
-    reg_queue = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+    reg_queue[0] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+    if (reg_queue == MAP_FAILED) {
+        perror("mmap");
+        exit(2);
+    }
+    reg_queue[1] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
     if (reg_queue == MAP_FAILED) {
         perror("mmap");
         exit(2);
@@ -76,7 +82,12 @@ void initialize_sem() {
         perror("mmap");
         exit(2);
     }
-    reg_pipe_lock = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+    reg_pipe_lock[0] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+    if (reg_pipe_lock == MAP_FAILED) {
+        perror("mmap");
+        exit(2);
+    }
+    reg_pipe_lock[1] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
     if (reg_pipe_lock == MAP_FAILED) {
         perror("mmap");
         exit(2);
@@ -149,10 +160,12 @@ void initialize_sem() {
         sem_init(pdrq_pids_lock[i], 1, 1);
     }
 
-    sem_init(reg_queue, 1, 1);
+    sem_init(reg_queue[0], 1, 1);
+    sem_init(reg_queue[1], 1, 1);
     sem_init(clinic_capacity, 1, MAX_CAPACITY);
     sem_init(rq_lock, 1, 1);
-    sem_init(reg_pipe_lock, 1, 1);
+    sem_init(reg_pipe_lock[0], 1, 1);
+    sem_init(reg_pipe_lock[1], 1, 1);
     sem_init(report_lock, 1, 1);
     sem_init(p_cnt_lock, 1, 1);
     sem_init(cs_lock, 1, 1);
@@ -162,10 +175,12 @@ void initialize_sem() {
 }
 
 void destroy_sem() {
-    sem_destroy(reg_queue);
+    sem_destroy(reg_queue[0]);
+    sem_destroy(reg_queue[1]);
     sem_destroy(clinic_capacity);
     sem_destroy(rq_lock);
-    sem_destroy(reg_pipe_lock);
+    sem_destroy(reg_pipe_lock[0]);
+    sem_destroy(reg_pipe_lock[1]);
     sem_destroy(report_lock);
     sem_destroy(p_cnt_lock);
     sem_destroy(cs_lock);
@@ -177,6 +192,8 @@ void destroy_sem() {
         sem_destroy(drq_lock[i]);
         sem_destroy(dr_queue[i]);
         sem_destroy(dr_pipe_lock[i]);
+        sem_destroy(drq_cnt_lock[i]);
+        sem_destroy(pdrq_pids_lock[i]);
         if (munmap(drq_lock[i], sizeof(sem_t)) < 0) {
             perror("munmap");
             exit(2);
@@ -199,7 +216,11 @@ void destroy_sem() {
         } 
     }
 
-    if (munmap(reg_queue, sizeof(sem_t)) < 0) {
+    if (munmap(reg_queue[0], sizeof(sem_t)) < 0) {
+        perror("munmap");
+        exit(2);
+    } 
+    if (munmap(reg_queue[1], sizeof(sem_t)) < 0) {
         perror("munmap");
         exit(2);
     } 
@@ -211,7 +232,11 @@ void destroy_sem() {
         perror("munmap");
         exit(2);
     } 
-    if (munmap(reg_pipe_lock, sizeof(sem_t)) < 0) {
+    if (munmap(reg_pipe_lock[0], sizeof(sem_t)) < 0) {
+        perror("munmap");
+        exit(2);
+    } 
+    if (munmap(reg_pipe_lock[1], sizeof(sem_t)) < 0) {
         perror("munmap");
         exit(2);
     } 
@@ -278,7 +303,7 @@ void share_variables() {
         perror("mmap");
         exit(4);
     }
-    drq_cnt = mmap(NULL, sizeof(int), protection, visibility, -1, 0);
+    drq_cnt = mmap(NULL, sizeof(int) * DR_NUM, protection, visibility, -1, 0);
     if (drq_cnt == MAP_FAILED) {
         perror("mmap");
         exit(4);
@@ -293,10 +318,15 @@ void share_variables() {
         perror("mmap");
         exit(4);
     }
+    desks_open = mmap(NULL, sizeof(int), protection, visibility, -1, 0);
+    if (desks_open == MAP_FAILED) {
+        perror("mmap");
+        exit(4);
+    }
 
     for (int i = 0; i < DR_NUM; i++) {
         pdrq_pids[i] = mmap(NULL, sizeof(pid_t) * MAX_P, protection, visibility, -1, 0);
-        if (pdrq_pids == MAP_FAILED) {
+        if (pdrq_pids[i] == MAP_FAILED) {
             perror("mmap");
             exit(4);
         }
@@ -334,6 +364,7 @@ void init_variables() {
     *p_cnt = 0;
     *emergency = 0;
     *r_pid = 0;
+    *desks_open = 1;
 
     dr_limits[0] = X5;
     dr_limits[1] = X4;
@@ -362,11 +393,19 @@ void init_variables() {
         }
     }
 
-    if (pipe(patient_register) < 0) {
+    if (pipe(patient_register[0]) < 0) {
         perror("pipe");
         exit(4);
     }
-    if (pipe(register_patient) < 0) {
+    if (pipe(register_patient[0]) < 0) {
+        perror("pipe");
+        exit(4);
+    }
+    if (pipe(patient_register[1]) < 0) {
+        perror("pipe");
+        exit(4);
+    }
+    if (pipe(register_patient[1]) < 0) {
         perror("pipe");
         exit(4);
     }
@@ -397,7 +436,7 @@ void free_variables() {
         perror("munmap");
         exit(4);
     }
-    if (munmap(emergency, sizeof(int) * DR_NUM) < 0) {
+    if (munmap(emergency, sizeof(int)) < 0) {
         perror("munmap");
         exit(4);
     }
@@ -406,6 +445,14 @@ void free_variables() {
         exit(4);
     }
     if (munmap(dr_pids, sizeof(pid_t) * DR_NUM) < 0) {
+        perror("munmap");
+        exit(4);
+    }
+    if (munmap(desks_open, sizeof(int)) < 0) {
+        perror("munmap");
+        exit(4);
+    }
+    if (munmap(drq_cnt, sizeof(int)) < 0) {
         perror("munmap");
         exit(4);
     }
@@ -422,15 +469,17 @@ void free_variables() {
         }
     }
 
-    close(patient_register[1]);
-    close(register_patient[1]);
-    close(patient_register[0]);
-    close(register_patient[0]);
+    for (int i = 0; i < REG_NUM; i++) {
+        close(patient_register[i][1]);
+        close(register_patient[i][1]);
+        close(patient_register[i][0]);
+        close(register_patient[i][0]);
+    }
 }
 
 void insert_pid(int dr_id, pid_t pid) {
     for (int i = 0; i < MAX_P; i++) {
-        if (pdrq_pids[dr_id][i] != -1) {
+        if (pdrq_pids[dr_id][i] == 0) {
             pdrq_pids[dr_id][i] = pid;
             break;
         }

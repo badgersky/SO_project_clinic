@@ -35,6 +35,7 @@ void patient_routine(int i) {
     int r = rand() % 10;
     int reg_resp = 0, dr_id, doc_resp1 = -1, doc_resp2 = -1;
     dr_id = get_rand_id();
+    int r_i = 0;
 
     if (r < 2) {
         if (i == 4 || i == 5) {
@@ -66,15 +67,21 @@ void patient_routine(int i) {
         pthread_detach(ch_id);
     }
 
+    sem_wait(rq_lock);
+    if (*desks_open == 2) {
+        r_i = rand() % 2;
+    }
+    sem_post(rq_lock);
+
     sem_wait(cs_lock);
     if (*clinic_state != 0) {
         sem_post(cs_lock);
         enter_clinic();
 
-        sem_wait(reg_queue);
+        sem_wait(reg_queue[r_i]);
         printf("patient %d goind to registration\n", getpid());
-        reg_resp = patient_registration(dr_id);
-        sem_post(reg_queue);
+        reg_resp = patient_registration(r_i, dr_id);
+        sem_post(reg_queue[r_i]);
 
         leave_queue();
         
@@ -151,27 +158,27 @@ int go_to_doc(int dr_id, int spec_id) {
 }
 
 
-int patient_registration(int dr_id) {
+int patient_registration(int r_i, int dr_id) {
     printf("patient %d registering to doctor %d\n", getpid(), dr_id);
     int reg_resp;
     pid_t pid = getpid();
 
-    close(patient_register[0]);
-    close(register_patient[1]);
+    close(patient_register[r_i][0]);
+    close(register_patient[r_i][1]);
 
     // printf("patient %d writing pid to register\n", getpid());
-    if (write(patient_register[1], &pid, sizeof(pid_t)) < 0) {
+    if (write(patient_register[r_i][1], &pid, sizeof(pid_t)) < 0) {
         perror("write patient reg");
         exit(3);
     }
     // printf("patient %d writing dr id %d to register\n", getpid(), dr_id);
-    if (write(patient_register[1], &dr_id, sizeof(int)) < 0) {
+    if (write(patient_register[r_i][1], &dr_id, sizeof(int)) < 0) {
         perror("write patient reg");
         exit(3);
     }
     
     // printf("patient %d reading register response\n", getpid());
-    if (read(register_patient[0], &reg_resp, sizeof(int)) < 0) {
+    if (read(register_patient[r_i][0], &reg_resp, sizeof(int)) < 0) {
         perror("read patient reg");
         exit(3);
     }
@@ -196,8 +203,10 @@ void leave_clinic() {
         close(doctor_patient[j][0]);
         close(doctor_patient[j][1]);
     }
-    close(patient_register[1]);
-    close(register_patient[0]);
+    close(patient_register[0][1]);
+    close(register_patient[0][0]);
+    close(patient_register[1][1]);
+    close(register_patient[1][0]);
 
     sem_post(clinic_capacity);
     exit(0);

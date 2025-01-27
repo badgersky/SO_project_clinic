@@ -16,7 +16,7 @@ void wait_patients();
 void leave_clinic();
 void enter_clinic();
 void leave_queue();
-int patient_registration(int dr_id);
+int patient_registration(int r_i, int dr_id);
 int go_to_doc(int dr_id, int spec_id);
 void p_sigusr2_handler();
 int is_minor();

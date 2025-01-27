@@ -27,8 +27,12 @@ int main() {
     pthread_create(&wait_t, NULL, *wait_for_processes, NULL);
     pthread_join(wait_t, NULL);
 
+    printf("lol1\n");
     cleanup_pids();
+    printf("lol2\n");
     free_variables();
+    printf("lol3\n");
     destroy_sem();
+    printf("lol3\n");
     return 0;
 }

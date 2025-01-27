@@ -28,11 +28,12 @@ void director_routine() {
         close(doctor_patient[j][0]);
         close(doctor_patient[j][1]);
     }
-
-    close(patient_register[1]);
-    close(register_patient[1]);
-    close(patient_register[0]);
-    close(register_patient[0]);
+    for (int j = 0; j < REG_NUM; j++) {
+        close(patient_register[j][1]);
+        close(register_patient[j][1]);
+        close(patient_register[j][0]);
+        close(register_patient[j][0]);
+    }
     do {
         printf("Director %d, Number of patients inside: %d\n", getpid(), MAX_CAPACITY - get_sem_value(clinic_capacity));
         full = check_limits();
