@@ -171,6 +171,7 @@ void destroy_sem() {
     sem_destroy(cs_lock);
     sem_destroy(rq_capacity);
     sem_destroy(emergency_lock);
+    sem_destroy(p_lock);
 
     for (int i = 0; i < DR_NUM; i++) {
         sem_destroy(drq_lock[i]);
@@ -231,6 +232,10 @@ void destroy_sem() {
         exit(2);
     } 
     if (munmap(emergency_lock, sizeof(sem_t)) < 0) {
+        perror("munmap");
+        exit(2);
+    } 
+    if (munmap(p_lock, sizeof(sem_t)) < 0) {
         perror("munmap");
         exit(2);
     } 
