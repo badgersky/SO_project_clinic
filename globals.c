@@ -63,12 +63,12 @@ void cleanup_pids() {
 
 void initialize_sem() {
     reg_queue[0] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
-    if (reg_queue == MAP_FAILED) {
+    if (reg_queue[0] == MAP_FAILED) {
         perror("mmap");
         exit(2);
     }
     reg_queue[1] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
-    if (reg_queue == MAP_FAILED) {
+    if (reg_queue[1] == MAP_FAILED) {
         perror("mmap");
         exit(2);
     }
@@ -83,12 +83,12 @@ void initialize_sem() {
         exit(2);
     }
     reg_pipe_lock[0] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
-    if (reg_pipe_lock == MAP_FAILED) {
+    if (reg_pipe_lock[0] == MAP_FAILED) {
         perror("mmap");
         exit(2);
     }
     reg_pipe_lock[1] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
-    if (reg_pipe_lock == MAP_FAILED) {
+    if (reg_pipe_lock[1] == MAP_FAILED) {
         perror("mmap");
         exit(2);
     }
@@ -308,7 +308,7 @@ void share_variables() {
         perror("mmap");
         exit(4);
     }
-    r_pid = mmap(NULL, sizeof(pid_t), protection, visibility, -1, 0);
+    r_pid = mmap(NULL, sizeof(pid_t) * REG_NUM, protection, visibility, -1, 0);
     if (r_pid == MAP_FAILED) {
         perror("mmap");
         exit(4);
@@ -363,7 +363,8 @@ void init_variables() {
     *clinic_state = 1;
     *p_cnt = 0;
     *emergency = 0;
-    *r_pid = 0;
+    r_pid[0] = 0;
+    r_pid[1] = 0;
     *desks_open = 1;
 
     dr_limits[0] = X5;
@@ -440,7 +441,7 @@ void free_variables() {
         perror("munmap");
         exit(4);
     }
-    if (munmap(r_pid, sizeof(pid_t)) < 0) {
+    if (munmap(r_pid, sizeof(pid_t) * REG_NUM) < 0) {
         perror("munmap");
         exit(4);
     }
@@ -452,7 +453,7 @@ void free_variables() {
         perror("munmap");
         exit(4);
     }
-    if (munmap(drq_cnt, sizeof(int)) < 0) {
+    if (munmap(drq_cnt, sizeof(int) * DR_NUM) < 0) {
         perror("munmap");
         exit(4);
     }
@@ -508,7 +509,7 @@ int get_sem_value(sem_t* s) {
 }
 
 void* wait_for_processes(void* arg) {
-    int proc_num = DR_NUM + MAX_P + 2;
+    int proc_num = DR_NUM + MAX_P + REG_NUM + 1;
     for (int i = 0; i < proc_num; i++) {
         if (wait(0) < 0) {
             perror("wait");

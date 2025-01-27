@@ -11,7 +11,7 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 500
+#define MAX_P 700
 
 #define TP 0
 #define TK 30

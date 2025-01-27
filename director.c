@@ -64,7 +64,8 @@ void close_clinic() {
         while (1) {
             if (MAX_CAPACITY - get_sem_value(clinic_capacity) == 0) {
                 sem_wait(p_lock);
-                kill(*r_pid, SIGUSR2);
+                kill(r_pid[0], SIGUSR2);
+                kill(r_pid[1], SIGUSR2);
                 for (int i = 0; i < DR_NUM; i++) {
                     if (dr_pids[i] != 0) kill(dr_pids[i], SIGUSR2);
                 }

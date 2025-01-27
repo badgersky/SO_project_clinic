@@ -7,7 +7,6 @@ void sigusr2_reg_handler(int sig) {
 void register_routine(int i) {
     signal(SIGUSR2, sigusr2_reg_handler);
     int done = 0;
-    int data, ret;
 
     close(register_patient[i][0]);
     close(patient_register[i][1]);
@@ -102,7 +101,7 @@ void create_registers() {
             register_routine(i);
         } else {
             sem_wait(p_lock);
-            *r_pid = pid;
+            r_pid[i] = pid;
             sem_post(p_lock);
         }
     }
