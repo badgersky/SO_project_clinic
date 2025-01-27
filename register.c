@@ -1,12 +1,6 @@
 #include "register.h"
 
 void sigusr2_reg_handler(int sig) {
-    while (1) {
-        if (MAX_CAPACITY - get_sem_value(clinic_capacity) == 0) {
-            break;
-        }
-    }
-
     exit(0);
 }
 

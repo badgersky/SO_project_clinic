@@ -60,10 +60,15 @@ void close_clinic() {
         printf("closing clinic\n");
         *clinic_state = 0;
         sem_post(cs_lock);
-        for (int i = 0; i < DR_NUM; i++) {
-            kill(dr_pids[i], SIGUSR2);
+        while (1) {
+            if (MAX_CAPACITY - get_sem_value(clinic_capacity) == 0) {
+                kill(*r_pid, SIGUSR2);
+                for (int i = 0; i < DR_NUM; i++) {
+                    if (dr_pids[i] != 0) kill(dr_pids[i], SIGUSR2);
+                }
+                break;
+            }
         }
-        kill(*r_pid, SIGUSR2);
     } else {
         sem_post(cs_lock);
     }

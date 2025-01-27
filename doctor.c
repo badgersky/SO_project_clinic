@@ -7,18 +7,12 @@ void sigusr1_handler(int sig) {
 }
 
 void sigusr2_doc_handler(int sig) {
-    while (1) {
-        if (MAX_CAPACITY - get_sem_value(clinic_capacity) == 0) {
-            break;
-        }
-    }
-
     printf("Doctor %d leaving\n", getpid());
     exit(0);
 }
 
 void doctor_routine(int i) {
-    int done = 0;
+    int done = check_limits();
 
     signal(SIGUSR1, sigusr1_handler);
     signal(SIGUSR2, sigusr2_doc_handler);
@@ -39,7 +33,7 @@ void doctor_routine(int i) {
     close(patient_doctor[i][1]);
     close(doctor_patient[i][0]);
 
-    do {
+    while(!done) {
         // printf("Doctor %d\n", getpid());
         examine_patient(i);
 
@@ -51,7 +45,7 @@ void doctor_routine(int i) {
             printf("Doctor %d is leaving\n", i);
         }
         // sleep(1);
-    } while(!done);
+    }
 
     exit(0);
 }
@@ -75,7 +69,9 @@ void examine_patient(int dr_id) {
     // printf("Doctor received spec id %d from patient %d\n", spec_id, p_pid);
     printf("Doctor %d %d examining patient %d\n", dr_id, getpid(), p_pid);
 
+    sem_wait(cs_lock);
     if (stop_treating) {
+        sem_post(cs_lock);
         char* msg = (char*) malloc(sizeof(char) * BUFFER);
         sprintf(msg, "%d - skierowanie do %d - koniec pracy doktora\n", p_pid, dr_id);
         sem_wait(report_lock);
@@ -83,6 +79,7 @@ void examine_patient(int dr_id) {
         sem_post(report_lock);
         free(msg);
     } else {
+        sem_post(cs_lock);
         if (spec_id >= 0 && spec_id <= 3) {
             sem_wait(drq_lock[dr_id]);
             if (dr_p_cnt[dr_id] < dr_limits[dr_id]) {
