@@ -1,6 +1,6 @@
 #include "globals.h"
 
-sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock[6];
+sem_t *reg_queue, *clinic_capacity, *rq_lock, *reg_pipe_lock, *drq_lock[6], *dr_queue[6], *dr_pipe_lock[6], *report_lock, *p_cnt_lock, *cs_lock, *rq_capacity, *emergency_lock, *drq_cnt_lock[6], *pdrq_pids_lock[6], *p_lock;
 
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED | MAP_ANONYMOUS;
@@ -106,6 +106,11 @@ void initialize_sem() {
         perror("mmap");
         exit(2);
     }
+    p_lock = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
+    if (p_lock == MAP_FAILED) {
+        perror("mmap");
+        exit(2);
+    }
 
     for (int i = 0; i < DR_NUM; i++) {
         drq_lock[i] = (sem_t*) mmap(NULL, sizeof(sem_t), protection, visibility, -1, 0);
@@ -153,6 +158,7 @@ void initialize_sem() {
     sem_init(cs_lock, 1, 1);
     sem_init(rq_capacity, 1, MAX_QUEUE);
     sem_init(emergency_lock, 1, 1);
+    sem_init(p_lock, 1, 1);
 }
 
 void destroy_sem() {

@@ -119,7 +119,9 @@ void create_doctors() {
             srand(time(0) + i);
             doctor_routine(i);
         } else {
+            sem_wait(p_lock);
             dr_pids[i] = pid;
+            sem_post(p_lock);
         }
     }
 }

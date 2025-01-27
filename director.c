@@ -48,7 +48,7 @@ void director_routine() {
             close_clinic();
             done = 1;
         }
-        sleep(1);
+        sleep(1); // ten sleep jest po to zeby logi wygladaly dobrze i przychodnia nie konczyla odrazu pracy
     } while(!done);
 
     exit(0);
@@ -62,10 +62,12 @@ void close_clinic() {
         sem_post(cs_lock);
         while (1) {
             if (MAX_CAPACITY - get_sem_value(clinic_capacity) == 0) {
+                sem_wait(p_lock);
                 kill(*r_pid, SIGUSR2);
                 for (int i = 0; i < DR_NUM; i++) {
                     if (dr_pids[i] != 0) kill(dr_pids[i], SIGUSR2);
                 }
+                sem_post(p_lock);
                 break;
             }
         }

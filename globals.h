@@ -16,7 +16,7 @@
 #define TP 0
 #define TK 30
 
-#define BUFFER 100
+#define BUFFER 30
 
 #define REG_NUM 2
 #define MAX_QUEUE 15
@@ -34,6 +34,7 @@ extern int visibility;
 // doctors and registers pids
 extern pid_t* r_pid;
 extern pid_t* dr_pids;
+extern sem_t* p_lock;
 
 // entering clinic, register control, queues
 extern sem_t* reg_queue;

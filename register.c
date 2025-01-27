@@ -108,7 +108,9 @@ void create_registers() {
     if (pid == 0) {
         register_routine();
     } else {
+        sem_wait(p_lock);
         *r_pid = pid;
+        sem_post(p_lock);
     }
 }
 
