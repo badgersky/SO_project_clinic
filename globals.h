@@ -11,10 +11,10 @@
 #define GLOBALS_H
 
 #define DR_NUM 6
-#define MAX_P 200
+#define MAX_P 500
 
 #define TP 0
-#define TK 40
+#define TK 30
 
 #define BUFFER 100
 
@@ -22,11 +22,11 @@
 #define MAX_QUEUE 15
 #define MAX_CAPACITY 30
 
-#define X5 10
-#define X4 10
-#define X3 10
-#define X2 10
-#define X1 20
+#define X5 50
+#define X4 50
+#define X3 50
+#define X2 50
+#define X1 50
 
 extern int protection;
 extern int visibility;
