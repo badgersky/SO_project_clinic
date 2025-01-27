@@ -20,3 +20,4 @@ int patient_registration(int dr_id);
 int go_to_doc(int dr_id, int spec_id);
 void p_sigusr2_handler();
 int is_minor();
+void* child_routine(void* arg);

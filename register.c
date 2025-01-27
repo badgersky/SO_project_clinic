@@ -81,12 +81,12 @@ void process_patient() {
 
 void open_close_register(int* desks_open) {
     sem_wait(reg_pipe_lock);
-    if (*desks_open == 1 && *rq_cnt > MAX_QUEUE / 2) {
+    if (*desks_open == 1 && get_sem_value(rq_capacity) < MAX_QUEUE / 2) {
         printf("second register open\n");
         sem_post(reg_queue);
         *desks_open += 1;
     }
-    if (*desks_open == 2 && *rq_cnt < MAX_QUEUE / 3) {
+    if (*desks_open == 2 && get_sem_value(rq_capacity) > MAX_QUEUE / 3) {
         int sem_val;
         sem_getvalue(reg_queue, &sem_val);
         if (sem_trywait(reg_queue) == 0 && sem_val == 2) {
